@@ -45,26 +45,20 @@ public:
 		handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
-	~console() {
-		set_color();
-		CloseHandle(handle_);
-	}
-
 	void clear() {
 		COORD topLeft = { 0, 0 };
-		HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_SCREEN_BUFFER_INFO screen;
 		DWORD written;
 
-		GetConsoleScreenBufferInfo(console, &screen);
+		GetConsoleScreenBufferInfo(handle_, &screen);
 		FillConsoleOutputCharacterA(
-			console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+			handle_, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
 		);
 		FillConsoleOutputAttribute(
-			console, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
+			handle_, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
 			screen.dwSize.X * screen.dwSize.Y, topLeft, &written
 		);
-		SetConsoleCursorPosition(console, topLeft);
+		SetConsoleCursorPosition(handle_, topLeft);
 	}
 
 	void set_color(const colors f_color, const colors bg_color = black) const {
@@ -80,18 +74,18 @@ public:
 		for (auto& i : m.items)
 		{
 			if (row_rended == m.row_items) {
-				std::wcout << std::endl;
+				std::cout << std::endl;
 				row_rended = 0;
 			}
 			if (row_rended == m.selection) {
 				set_color(light_yellow);
-				std::wcout << i;
+				std::cout << i;
 				set_color();
 			}
 			else {
-				std::wcout << i;
+				std::cout << i;
 			}
-			std::wcout << "    ";
+			std::cout << "    ";
 			row_rended++;
 		}
 	}
