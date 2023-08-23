@@ -19,12 +19,13 @@ progress<int> openning(std::string version) {
 
 progress<int> main_menu() {
 	auto c = console();
-	std::wcout << L"    ";
+	std::cout << "    ";
 	c.set_color(console::colors::black, console::colors::white);
-	auto m = menu({ L"开始游戏", L"加载游戏", L"退出游戏" }, 3, 0);
+	auto m = menu({ "开始游戏", "加载游戏", "退出游戏" }, 3, 0);
 	auto result = progress<int>(false, true, 0);
 	c.clear();
 	while (true) {
+		system("cls");
 		c.menu_render(m);
 		auto command = c.get_arrow_command();
 		switch (command) {
