@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-bool print_ascii_images(std::string path, bool is_utf8) {
+bool printAsciiImage(std::string path, bool is_utf8) {
 	if (is_utf8) {
 		std::locale::global(std::locale("en_US.UTF8"));
 	}

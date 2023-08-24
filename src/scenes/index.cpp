@@ -1,43 +1,42 @@
 #include "main.hpp"
 
 progress<int> openning(std::string version) {
-	auto c = console();
-	c.set_color(console::colors::light_blue);
-	print_ascii_images("src/ascii_images/author.txt");
+	auto c = Console();
+	c.SetColor(Console::Colors::light_blue);
+	printAsciiImage("src/ascii_images/author.txt");
 	Sleep(3000);
-	c.clear();
-	c.set_color();
-	c.set_color(console::colors::cyan);
-	print_ascii_images("src/ascii_images/title.txt");
-	c.set_color();
+	c.Clear();
+	c.SetColor();
+	c.SetColor(Console::Colors::cyan);
+	printAsciiImage("src/ascii_images/title.txt");
+	c.SetColor();
 	std::cout << std::endl;
-	c.set_color(console::colors::yellow);
+	c.SetColor(Console::Colors::yellow);
 	std::cout << "Version: " << version << " | This is a development version!" << std::endl;
 
 	return true;
 }
 
-progress<int> main_menu() {
-	auto c = console();
+progress<int> mainMenu() {
+	auto c = Console();
 	std::cout << "    ";
-	c.set_color(console::colors::black, console::colors::white);
-	auto m = menu({ "开始游戏", "加载游戏", "退出游戏" }, 3, 0);
+	c.SetColor(Console::Colors::black, Console::Colors::white);
+	auto m = Menu({ "开始游戏", "加载游戏", "退出游戏" }, 3, 43, 11, 0);
 	auto result = progress<int>(false, true, 0);
-	c.clear();
 	while (true) {
-		system("cls");
-		c.menu_render(m);
-		auto command = c.get_arrow_command();
+		c.MenuRender(m);
+		auto command = c.GetArrowCommand();
 		switch (command) {
-		case console::arrow_commands::left:
+		case Console::ArrowCommands::left:
 			m.selection--;
 			break;
-		case console::arrow_commands::right:
+		case Console::ArrowCommands::right:
 			m.selection++;
 			break;
-		case console::arrow_commands::enter:
+		case Console::ArrowCommands::enter:
 			result.is_ok = true;
 			result.info = m.selection;
+			c.Clear();
 			return result;
 
 		default:
@@ -49,7 +48,6 @@ progress<int> main_menu() {
 		else if (m.selection >= m.items.size()) {
 			m.selection = 0;
 		}
-		std::cout << m.selection;
 	}
 	return result;
 }

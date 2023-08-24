@@ -7,13 +7,13 @@
 #include <conio.h>
 #include "models/menu.hpp"
 
-class console {
+class Console {
 
 private:
 	HANDLE handle_;
 
 public:
-	enum colors {
+	enum Colors {
 		black = 0,
 		blue = 1,
 		green = 2,
@@ -32,7 +32,7 @@ public:
 		bright_white = 15
 	};
 
-	enum arrow_commands {
+	enum ArrowCommands {
 		up = 72,
 		down = 80,
 		left = 75,
@@ -41,11 +41,24 @@ public:
 		esc = 27
 	};
 
-	console() {
+	Console() {
 		handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
-	void clear() {
+	~Console() = default;
+
+	void GotoXY(short x, short y) {
+		COORD c = { x,y };
+		SetConsoleCursorPosition(handle_, c);
+	}
+
+	TerminalSize GetTerminalSize() {
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		GetConsoleScreenBufferInfo(handle_, &csbi);
+		return TerminalSize{ csbi.srWindow.Right - csbi.srWindow.Left + 1, csbi.srWindow.Bottom - csbi.srWindow.Top + 1 };
+	}
+
+	void Clear() {
 		COORD topLeft = { 0, 0 };
 		CONSOLE_SCREEN_BUFFER_INFO screen;
 		DWORD written;
@@ -61,15 +74,21 @@ public:
 		SetConsoleCursorPosition(handle_, topLeft);
 	}
 
-	void set_color(const colors f_color, const colors bg_color = black) const {
+	void SetColor(const Colors f_color, const Colors bg_color = black) const {
 		SetConsoleTextAttribute(handle_, f_color | bg_color << 4);
 	}
 
-	void set_color() const {
-		SetConsoleTextAttribute(handle_, white | black << 4);
+	void SetColor() const {
+		SetConsoleTextAttribute(handle_, white);
 	}
 
-	void menu_render(const menu m) {
+	void MenuRender(const Menu m) {
+		GotoXY(0, m.y);
+		for (int i = 0; i < 117; i++) {
+			std::cout << "=";
+		}
+		auto colSize = GetTerminalSize().cols;
+		GotoXY(m.x, m.y + 1);
 		int row_rended = 0;
 		for (auto& i : m.items)
 		{
@@ -78,9 +97,9 @@ public:
 				row_rended = 0;
 			}
 			if (row_rended == m.selection) {
-				set_color(light_yellow);
+				SetColor(light_yellow);
 				std::cout << i;
-				set_color();
+				SetColor();
 			}
 			else {
 				std::cout << i;
@@ -88,9 +107,13 @@ public:
 			std::cout << "    ";
 			row_rended++;
 		}
+		GotoXY(0, m.y + 2);
+		for (int i = 0; i < 117; i++) {
+			std::cout << "=";
+		}
 	}
 
-	arrow_commands static get_arrow_command() {
+	ArrowCommands static GetArrowCommand() {
 		int ch = _getch();
 		while (ch != esc) {
 			switch (ch) {
