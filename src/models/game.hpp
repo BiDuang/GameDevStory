@@ -6,47 +6,7 @@
 #include <random>
 #include <vector>
 
-class GameData {
-private:
-	unsigned short devProgress = 0;
-public:
-	unsigned int day = 0;
-	bool isDeveloping = false;
-	int money = 0;
-	Product* workingProduct = nullptr;
-
-	GameData() {
-		day = 0;
-		isDeveloping = false;
-		money = 0;
-		workingProduct = nullptr;
-	}
-
-	~GameData() {
-		if (workingProduct != nullptr) {
-			delete workingProduct;
-		}
-	}
-
-	void RoundDev(double bonus) {
-		unsigned short basicProgress = 1 + rand() % 5;
-		devProgress += basicProgress * bonus;
-		if (devProgress >= 100) {
-			isDeveloping = false;
-		}
-	}
-
-	unsigned short GetDevProgress() {
-		return devProgress;
-	}
-};
-
-class Studio {
-public:
-	std::string name;
-	std::vector<Stuff> stuffs;
-	std::vector<Product> finishedProducts;
-};
+#include <optional>
 
 class Product {
 public:
@@ -90,4 +50,32 @@ public:
 	}
 };
 
+class Studio {
+public:
+	std::string name;
+	std::vector<Stuff> stuffs;
+	std::vector<Product> finishedProducts;
+};
+
+class GameData {
+private:
+	unsigned short devProgress = 0;
+public:
+	unsigned int day = 0;
+	bool isDeveloping = false;
+	int money = 0;
+	std::optional<Product> workingProduct = std::nullopt;
+
+	void RoundDev(double bonus) {
+		unsigned short basicProgress = 1 + rand() % 5;
+		devProgress += basicProgress * bonus;
+		if (devProgress >= 100) {
+			isDeveloping = false;
+		}
+	}
+
+	unsigned short GetDevProgress() {
+		return devProgress;
+	}
+};
 #endif // !GAME_HPP
