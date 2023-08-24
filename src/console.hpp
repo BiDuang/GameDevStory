@@ -45,8 +45,6 @@ public:
 		handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
-	~Console() = default;
-
 	void GotoXY(short x, short y) {
 		COORD c = { x,y };
 		SetConsoleCursorPosition(handle_, c);
