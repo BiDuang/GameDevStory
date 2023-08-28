@@ -30,6 +30,9 @@
     <ClCompile Include="src\scenes\game.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\rand.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\console.hpp">

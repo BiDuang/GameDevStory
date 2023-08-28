@@ -10,16 +10,14 @@
 #include "../models/progress.hpp"
 #include "../models/game.hpp"
 
-extern progress<int> openning(std::string version);
-extern progress<int> mainMenu();
+extern void openning();
+extern void mainMenu(std::string version);
 
 extern progress<int> beginning();
+extern progress<int> loadsave();
 
-class GameSceneRender {
-public:
-	static void Studio(bool isDeveloping = false) {
+extern void gameCycle();
+extern progress<int> studio();
 
-	}
-};
 
 #endif

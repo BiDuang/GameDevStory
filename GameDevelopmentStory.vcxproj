@@ -136,6 +136,7 @@
     <ClCompile Include="src\scenes\index.cpp" />
     <ClCompile Include="src\utils\main.hpp" />
     <ClCompile Include="src\utils\print.cpp" />
+    <ClCompile Include="src\utils\rand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\models\game.hpp" />

@@ -45,6 +45,11 @@ public:
 		handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
+	void GotoXY() {
+		COORD c = { 0,0 };
+		SetConsoleCursorPosition(handle_, c);
+	}
+
 	void GotoXY(short x, short y) {
 		COORD c = { x,y };
 		SetConsoleCursorPosition(handle_, c);
@@ -86,15 +91,13 @@ public:
 			std::cout << "=";
 		}
 		auto colSize = GetTerminalSize().cols;
-		GotoXY(m.x, m.y + 1);
-		int row_rended = 0;
+		GotoXY(4, m.y + 1);
+
+		int total_rended = 0;
 		for (auto& i : m.items)
 		{
-			if (row_rended == m.row_items) {
-				std::cout << std::endl;
-				row_rended = 0;
-			}
-			if (row_rended == m.selection) {
+			std::cout << "> ";
+			if (total_rended == m.selection) {
 				SetColor(light_yellow);
 				std::cout << i;
 				SetColor();
@@ -102,10 +105,11 @@ public:
 			else {
 				std::cout << i;
 			}
-			std::cout << "    ";
-			row_rended++;
+
+			GotoXY(4, m.y + 1 + (++total_rended));
+
 		}
-		GotoXY(0, m.y + 2);
+		GotoXY(0, m.y + 1 + total_rended);
 		for (int i = 0; i < 117; i++) {
 			std::cout << "=";
 		}

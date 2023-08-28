@@ -31,22 +31,60 @@ public:
 	}
 };
 
+enum JobType {
+	programmer,
+	artist,
+	musician,
+	designer,
+	almighty
+};
+
 class Stuff {
 public:
-	unsigned short program;
-	unsigned short art;
-	unsigned short audio;
-	unsigned short design;
-	unsigned int happiness;
-	unsigned int salary;
+	int id = 0;
+	unsigned short program = 0;
+	unsigned short art = 0;
+	unsigned short audio = 0;
+	unsigned short design = 0;
+	unsigned int happiness = 0;
+	unsigned int salary = 0;
 
-	Stuff(unsigned short program, unsigned short art, unsigned short audio,
+	Stuff(int id, unsigned short program, unsigned short art, unsigned short audio,
 		unsigned short design, unsigned int happiness, unsigned int salary) :
-		program(program), art(art), audio(audio), design(design), happiness(happiness), salary(salary)
+		id(id), program(program), art(art), audio(audio), design(design), happiness(happiness), salary(salary)
 	{}
 
-	Stuff(unsigned int day) {
+	Stuff(unsigned int day, JobType job, int stuffId) {
+		id = stuffId;
+		program = randint(1, (10 * (day / 5 + 1)));
+		art = randint(1, (10 * (day / 5 + 1)));
+		audio = randint(1, (10 * (day / 5 + 1)));
+		design = randint(1, (10 * (day / 5 + 1)));
 
+		switch (job)
+		{
+		case programmer:
+			program *= 2;
+			break;
+		case artist:
+			art *= 2;
+			break;
+		case musician:
+			audio *= 2;
+			break;
+		case designer:
+			design *= 2;
+			break;
+		case almighty:
+			program *= 2;
+			art *= 2;
+			audio *= 2;
+			design *= 2;
+			break;
+		}
+
+		salary = randint(1500, (program + art + audio + design) * 100);
+		happiness = 100;
 	}
 };
 
@@ -55,6 +93,11 @@ public:
 	std::string name;
 	std::vector<Stuff> stuffs;
 	std::vector<Product> finishedProducts;
+
+	Studio(std::string name) : name(name) {
+		stuffs = { Stuff(0,programmer,0), Stuff(0,artist,1), Stuff(0,musician,2), Stuff(0,designer,3) };
+		finishedProducts = std::vector<Product>();
+	}
 };
 
 class GameData {
@@ -62,16 +105,42 @@ private:
 	unsigned short devProgress = 0;
 public:
 	unsigned int day = 0;
+	short stage = 0;
 	bool isDeveloping = false;
 	int money = 0;
 	std::optional<Product> workingProduct = std::nullopt;
+	std::optional<Studio> studio = std::nullopt;
 
-	void RoundDev(double bonus) {
-		unsigned short basicProgress = 1 + rand() % 5;
-		devProgress += basicProgress * bonus;
-		if (devProgress >= 100) {
-			isDeveloping = false;
+	GameData() = default;
+
+	GameData(std::string studioName) {
+		studio = Studio(studioName);
+		money = 100000;
+	}
+
+	Studio GetStudio() {
+		if (!studio.has_value()) {
+			throw std::exception("Studio is not initialized");
 		}
+		return studio.value();
+	}
+
+	bool RoundDev(double bonus) {
+		srand(time(NULL));
+		stage++;
+		if (isDeveloping) {
+			unsigned short basicProgress = 1 + rand() % 5;
+			devProgress += basicProgress * bonus;
+			if (devProgress >= 100) {
+				isDeveloping = false;
+			}
+		}
+		if (stage > 3) {
+			stage = 0;
+			day++;
+			return true;
+		}
+		return false;
 	}
 
 	unsigned short GetDevProgress() {
