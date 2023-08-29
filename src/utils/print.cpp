@@ -29,7 +29,6 @@ int printMenu(Menu m, Console& c) {
 			m.selection++;
 			break;
 		case Console::ArrowCommands::enter:
-			c.Clear();
 			selected = true;
 			return m.selection;
 		default:

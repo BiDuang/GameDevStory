@@ -8,23 +8,30 @@
 
 #include <optional>
 
+enum Platform {
+	PC,
+	Mobile,
+	XCase,
+	Zwitch,
+	PS114514
+};
+
 class Product {
 public:
 	std::string name;
 	unsigned int createDay;
-	unsigned int interesting;
-	unsigned int playability;
-	unsigned int graphics;
-	unsigned int sound;
-	unsigned int stability;
+	unsigned int interesting = 0;
+	unsigned int playability = 0;
+	unsigned int graphics = 0;
+	unsigned int sound = 0;
+	unsigned int stability = 0;
+	Platform platform;
 
 	unsigned long long sales;
 	unsigned long long profit;
 
-	Product(std::string name, unsigned int createDay, unsigned int interesting,
-		unsigned int playability, unsigned int graphics, unsigned int sound, unsigned int stability) :
-		name(name), createDay(createDay), interesting(interesting), playability(playability),
-		graphics(graphics), sound(sound), stability(stability)
+	Product(std::string name, unsigned int createDay, Platform platform) :
+		name(name), createDay(createDay), platform(platform)
 	{
 		sales = 0;
 		profit = 0;
@@ -83,8 +90,12 @@ public:
 			break;
 		}
 
-		salary = randint(1500, (program + art + audio + design) * 100);
+		salary = randint(1500, (program + art + audio + design) > 15 ? ((program + art + audio + design) * 100) : 1600);
 		happiness = 100;
+	}
+
+	void roundWork() {
+		happiness -= randint(0, 3);
 	}
 };
 
@@ -106,6 +117,8 @@ private:
 public:
 	unsigned int day = 0;
 	short stage = 0;
+	bool noConfirm = false;
+	bool isFastDev = false;
 	bool isDeveloping = false;
 	int money = 0;
 	std::optional<Product> workingProduct = std::nullopt;
@@ -125,12 +138,11 @@ public:
 		return studio.value();
 	}
 
-	bool RoundDev(double bonus) {
-		srand(time(NULL));
+	bool RoundDev() {
 		stage++;
 		if (isDeveloping) {
-			unsigned short basicProgress = 1 + rand() % 5;
-			devProgress += basicProgress * bonus;
+			unsigned short basicProgress = randint(1, 5);
+			devProgress += basicProgress * isFastDev ? 2 : 1;
 			if (devProgress >= 100) {
 				isDeveloping = false;
 			}

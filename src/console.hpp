@@ -77,6 +77,22 @@ public:
 		SetConsoleCursorPosition(handle_, topLeft);
 	}
 
+	void Clear(short x, short y, short dx, short dy) {
+		COORD topLeft = { x, y };
+		CONSOLE_SCREEN_BUFFER_INFO screen;
+		DWORD written;
+
+		GetConsoleScreenBufferInfo(handle_, &screen);
+		FillConsoleOutputCharacterA(
+			handle_, ' ', dx * dy, topLeft, &written
+		);
+		FillConsoleOutputAttribute(
+			handle_, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE,
+			dx * dy, topLeft, &written
+		);
+		SetConsoleCursorPosition(handle_, topLeft);
+	}
+
 	void SetColor(const Colors f_color, const Colors bg_color = black) const {
 		SetConsoleTextAttribute(handle_, f_color | bg_color << 4);
 	}
@@ -85,25 +101,29 @@ public:
 		SetConsoleTextAttribute(handle_, white);
 	}
 
-	void MenuRender(const Menu m) {
+	void MenuRender(Menu m) {
 		GotoXY(0, m.y);
 		for (int i = 0; i < 117; i++) {
 			std::cout << "=";
 		}
-		auto colSize = GetTerminalSize().cols;
+
 		GotoXY(4, m.y + 1);
+		if (m.title != "") {
+			std::cout << m.title;
+			m.y++;
+			GotoXY(4, m.y + 1);
+		}
 
 		int total_rended = 0;
 		for (auto& i : m.items)
 		{
-			std::cout << "> ";
 			if (total_rended == m.selection) {
-				SetColor(light_yellow);
-				std::cout << i;
+				SetColor(yellow, gray);
+				std::cout << " > " << i << " ";
 				SetColor();
 			}
 			else {
-				std::cout << i;
+				std::cout << " - " << i << " ";
 			}
 
 			GotoXY(4, m.y + 1 + (++total_rended));

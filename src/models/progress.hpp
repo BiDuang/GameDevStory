@@ -8,6 +8,7 @@ public:
 	bool is_extra_info = false;
 	T info = 0;
 
+	progress() = delete;
 	progress(bool is_ok, bool is_extra_info = false, T info = 0) :
 		is_ok(is_ok), is_extra_info(is_extra_info), info(info) {}
 

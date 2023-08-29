@@ -10,9 +10,10 @@ public:
 	std::vector<std::string> items;
 	int y = 0;
 	int selection = 0;
+	std::string title;
 
-	Menu(std::vector<std::string> items, int y, int selection) :
-		items(items), y(y), selection(selection) {}
+	Menu(std::vector<std::string> items, int y, int selection, std::string title = "") :
+		items(items), y(y), selection(selection), title(title) {}
 
 	~Menu() {
 		items.clear();
