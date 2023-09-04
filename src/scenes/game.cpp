@@ -1,13 +1,14 @@
 #include "main.hpp"
+#include <memory>
 
-GameData instance;
+std::unique_ptr<GameData> instance;
 
 void gameCycle() {
-	auto c = Console();
+	Console c;
 	while (true) {
 		auto result = studio(c);
 		if (result.info == 0)
-			instance.RoundDev(c);
+			instance->RoundDev(c);
 	}
 }
 
@@ -39,8 +40,8 @@ progress<int> beginning() {
 			c.SetColor();
 			continue;
 		}
-		instance = GameData(name);
-		std::cout << "好的，你的工作室名称为: " << instance.GetStudio().name << std::endl;
+		instance = std::make_unique<GameData>(name);
+		std::cout << "好的，你的工作室名称为: " << instance->GetStudio().name << std::endl;
 		std::cout << "是这样吗？" << std::endl << std::endl;
 		auto result = printMenu(Menu({ "是，就这个了","否，我再想想" }, 5, 0), c);
 		if (result == 0) return progress<int>(true);
@@ -143,17 +144,17 @@ progress<int> createGame(Console& c) {
 
 	auto confirm = printMenu(Menu({ "是","否" }, 4, 0, "确认要开始制作新游戏吗? 这将花费 $5000 作为立项经费。"), c);
 	if (confirm == 0) {
-		instance.RoundDev(c);
-		instance.workingProduct = Product(name, instance.day, Platform(platform), GameType(gameType));
-		instance.isDeveloping = true;
-		instance.money -= 5000;
+		instance->RoundDev(c);
+		instance->workingProduct = Product(name, instance->day, Platform(platform), GameType(gameType));
+		instance->isDeveloping = true;
+		instance->money -= 5000;
 	}
 	return progress<int>(true);
 }
 
 progress<int> setDevPlan(Console& c) {
 	std::string s1 = "调整开发速度", name;
-	s1 += instance.isFastDev ? "为\"普通开发\"" : "为\"加急开发\"";
+	s1 += instance->isFastDev ? "为\"普通开发\"" : "为\"加急开发\"";
 	switch (printMenu(Menu({ "更改游戏名称",s1,"返回" }, 15, true), c))
 	{
 	case 0:
@@ -185,12 +186,12 @@ progress<int> setDevPlan(Console& c) {
 			}
 			break;
 		}
-		instance.workingProduct.value().name = name;
+		instance->workingProduct.value().name = name;
 		break;
 	case 1:
-		if (instance.isFastDev) printMenu(Menu({ "好的" }, 15, 0, "开发速度已被调整为普通速度。"), c);
+		if (instance->isFastDev) printMenu(Menu({ "好的" }, 15, 0, "开发速度已被调整为普通速度。"), c);
 		else printMenu(Menu({ "好的" }, 15, 0, "开发速度已被调整为加急，这将在加快游戏开发进程的同时牺牲品质"), c);
-		instance.isFastDev = !instance.isFastDev;
+		instance->isFastDev = !instance->isFastDev;
 		break;
 	case 2:
 		return progress<int>(true);
@@ -217,13 +218,13 @@ progress<int> studio(Console& c) {
 	std::cout << "===========================" << std::endl;
 	std::cout << "> Day ";
 	c.SetColor(Console::Colors::cyan);
-	std::cout << instance.day;
+	std::cout << instance->day;
 	c.SetColor();
 	c.GotoXY(11, 1);
 	std::cout << "|  ";
 
 	for (int i = 0; i < 4; i++) {
-		if (i != instance.stage) {
+		if (i != instance->stage) {
 			c.SetColor(Console::Colors::gray);
 			std::cout << "=  ";
 		}
@@ -242,21 +243,21 @@ progress<int> studio(Console& c) {
 	c.GotoXY(0, 3);
 	std::cout << "[ 工作室名称 ] ";
 	c.GotoXY(4, 4);
-	std::cout << instance.GetStudio().name;
+	std::cout << instance->GetStudio().name;
 	c.GotoXY(18, 4);
 	std::cout << " 工作室";
 	c.GotoXY(0, 6);
 	std::cout << "[ 资金 ] ";
 	c.GotoXY(4, 7);
 	c.SetColor(Console::Colors::yellow);
-	std::cout << "$ " << instance.money;
+	std::cout << "$ " << instance->money;
 	c.SetColor();
 	c.GotoXY(0, 9);
 	std::cout << "[ 工作室状态 ] ";
 	c.GotoXY(2, 10);
-	if (instance.isDeveloping) {
+	if (instance->isDeveloping) {
 		c.SetColor(Console::Colors::light_green);
-		std::cout << "正在开发:" << instance.workingProduct.value().name;
+		std::cout << "正在开发:" << instance->workingProduct.value().name;
 	}
 	else {
 		c.GotoXY(4, 10);
@@ -267,9 +268,9 @@ progress<int> studio(Console& c) {
 	c.GotoXY(0, 12);
 	std::cout << "[ 历史信息 ] ";
 	c.GotoXY(4, 13);
-	if (instance.GetStudio().finishedProducts.size() != 0) {
+	if (instance->GetStudio().finishedProducts.size() != 0) {
 		c.SetColor(Console::Colors::light_magenta);
-		std::cout << "已发布了 " << instance.GetStudio().finishedProducts.size() << "件作品";
+		std::cout << "已发布了 " << instance->GetStudio().finishedProducts.size() << "件作品";
 	}
 	else {
 		c.SetColor(Console::Colors::gray);
@@ -287,7 +288,7 @@ progress<int> studio(Console& c) {
 	c.SetColor(Console::Colors::light_cyan);
 	std::cout << "  编号    编程    美工    音乐    策划    心情    月薪  ";
 	c.SetColor();
-	if (instance.GetStudio().stuffs.size() == 0) {
+	if (instance->GetStudio().stuffs.size() == 0) {
 		c.GotoXY(33, 7);
 		c.SetColor(Console::gray);
 		std::cout << "当前没有雇佣任何员工！";
@@ -295,7 +296,7 @@ progress<int> studio(Console& c) {
 	}
 	else {
 		int i = 7;
-		for (auto& stuff : instance.GetStudio().stuffs) {
+		for (auto& stuff : instance->GetStudio().stuffs) {
 			c.GotoXY(33, i);
 			std::cout << stuff.id;
 			c.GotoXY(41, i);
@@ -322,17 +323,17 @@ progress<int> studio(Console& c) {
 	c.GotoXY(90, 1);
 	std::cout << " 产品进度";
 	c.GotoXY(90, 3);
-	if (instance.isDeveloping)
+	if (instance->isDeveloping)
 	{
 		c.GotoXY(93, 3);
 		std::cout << "[ 作品名称 ] ";
 		c.GotoXY(97, 4);
-		std::cout << instance.workingProduct.value().name;
+		std::cout << instance->workingProduct.value().name;
 		c.GotoXY(93, 6);
 		std::cout << "[ 开发进度 ] ";
 		c.GotoXY(97, 7);
-		std::cout << instance.GetDevProgress() << "%";
-		if (instance.isFastDev) {
+		std::cout << instance->GetDevProgress() << "%";
+		if (instance->isFastDev) {
 			c.GotoXY(103, 7);
 			c.SetColor(Console::light_red);
 			std::cout << "加急开发";
@@ -341,15 +342,15 @@ progress<int> studio(Console& c) {
 		c.GotoXY(93, 9);
 		std::cout << "[ 作品数据 ] ";
 		c.GotoXY(93, 10);
-		std::cout << "趣味: " << instance.workingProduct.value().interesting;
+		std::cout << "趣味: " << instance->workingProduct.value().interesting;
 		c.GotoXY(104, 10);
-		std::cout << "画面: " << instance.workingProduct.value().graphics;
+		std::cout << "画面: " << instance->workingProduct.value().graphics;
 		c.GotoXY(93, 11);
-		std::cout << "音乐: " << instance.workingProduct.value().sound;
+		std::cout << "音乐: " << instance->workingProduct.value().sound;
 		c.GotoXY(104, 11);
-		std::cout << "玩法: " << instance.workingProduct.value().playability;
+		std::cout << "玩法: " << instance->workingProduct.value().playability;
 		c.GotoXY(97, 12);
-		std::cout << "稳定: " << instance.workingProduct.value().stability;
+		std::cout << "稳定: " << instance->workingProduct.value().stability;
 	}
 	else {
 		c.GotoXY(93, 7);
@@ -365,7 +366,7 @@ progress<int> studio(Console& c) {
 	int subResult;
 	switch (result) {
 	case 0:
-		if (instance.noConfirm) return progress<int>(true, true, 0);
+		if (instance->noConfirm) return progress<int>(true, true, 0);
 		if (printMenu(Menu({ "是","否" }, 15, 0, "确定要进入下一回合吗？"), c) == 0) return progress<int>(true, true, 0);
 		return progress<int>(true, true, -1);
 	case 1:
@@ -376,16 +377,16 @@ progress<int> studio(Console& c) {
 			createGame(c);
 			break;
 		case 1:
-			if (instance.isDeveloping)
+			if (instance->isDeveloping)
 				setDevPlan(c);
 			else
 				printMenu(Menu({ "好的" }, 15, 0, "当前没有正在开发的项目！"), c);
 			break;
 		case 2:
-			if (instance.workingProduct.value().isFinished)
+			if (instance->workingProduct.value().isFinished)
 			{
-				instance.workingProduct.value().publishDay = instance.day;
-				instance.PublishProduct();
+				instance->workingProduct.value().publishDay = instance->day;
+				instance->PublishProduct();
 			}
 			else
 				printMenu(Menu({ "好的" }, 15, 0, "游戏还没有制作完成，不能发售！"), c);
@@ -403,7 +404,7 @@ progress<int> studio(Console& c) {
 			if (!printMenu(Menu({ "是","否" }, 15, 0, "确定要给工作室放一天假吗？这为每位员工恢复35点心情。"), c))
 			{
 				printMenu(Menu({ "好的" }, 15, 0,
-					instance.TakeADayOff() ? "工作室休了一天假，所有员工都好好歇了一口气。" : "今天上过班了，已经不算休假了。"), c);
+					instance->TakeADayOff() ? "工作室休了一天假，所有员工都好好歇了一口气。" : "今天上过班了，已经不算休假了。"), c);
 			}
 			break;
 		}
@@ -417,15 +418,15 @@ progress<int> studio(Console& c) {
 
 			while (flag) {
 				s1 = "自动确认操作: ", s2 = "每日自动保存: ";
-				s1 += instance.noConfirm ? "是" : "否";
-				s2 += instance.isAutoSave ? "是" : "否";
+				s1 += instance->noConfirm ? "是" : "否";
+				s2 += instance->isAutoSave ? "是" : "否";
 				switch (printMenu(Menu({ s1,s2,"返回" }, 15, true), c))
 				{
 				case 0:
-					instance.noConfirm = !instance.noConfirm;
+					instance->noConfirm = !instance->noConfirm;
 					break;
 				case 1:
-					instance.isAutoSave = !instance.isAutoSave;
+					instance->isAutoSave = !instance->isAutoSave;
 					break;
 				case 2:
 					flag = false;
