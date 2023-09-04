@@ -38,6 +38,7 @@ public:
 		left = 75,
 		right = 77,
 		enter = 13,
+		backspace = 8,
 		esc = 27
 	};
 
@@ -135,7 +136,7 @@ public:
 		}
 	}
 
-	ArrowCommands static GetArrowCommand() {
+	ArrowCommands static GetArrowCommand(bool hasReturn = false) {
 		int ch = _getch();
 		while (ch != esc) {
 			switch (ch) {
@@ -149,6 +150,12 @@ public:
 				return right;
 			case enter:
 				return enter;
+			case backspace:
+				if (hasReturn)
+					return backspace;
+				else
+					ch = _getch();
+				break;
 			default:
 				ch = _getch();
 				break;
@@ -156,7 +163,6 @@ public:
 		}
 		return esc;
 	}
-
 };
 
 #endif //CONSOLE_H

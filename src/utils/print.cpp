@@ -1,5 +1,18 @@
 #include "main.hpp"
 
+std::string& trim(std::string& s)
+{
+	if (s.empty())
+	{
+		return s;
+	}
+
+	s.erase(0, s.find_first_not_of(" "));
+	s.erase(s.find_last_not_of(" ") + 1);
+	s.erase(0, s.find_first_not_of("\t"));
+	s.erase(s.find_last_not_of("\t") + 1);
+	return s;
+}
 
 bool printAsciiImage(std::string path, bool is_utf8) {
 	if (is_utf8) {
@@ -20,17 +33,22 @@ int printMenu(Menu m, Console& c) {
 	bool selected = false;
 	while (!selected) {
 		c.MenuRender(m);
-		auto command = c.GetArrowCommand();
+		auto command = c.GetArrowCommand(m.hasReturn);
 		switch (command) {
-		case Console::ArrowCommands::up:
+		case Console::up:
 			m.selection--;
 			break;
-		case Console::ArrowCommands::down:
+		case Console::down:
 			m.selection++;
 			break;
-		case Console::ArrowCommands::enter:
+		case Console::enter:
 			selected = true;
+			c.Clear(0, m.y, 120, m.items.size() + 2 + (!m.title.empty()));
 			return m.selection;
+		case Console::backspace:
+			selected = true;
+			c.Clear(0, m.y, 120, m.items.size() + 2 + (!m.title.empty()));
+			return m.items.size() - 1;
 		default:
 			break;
 		}

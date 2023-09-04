@@ -2,6 +2,7 @@
 #define SCENES_HPP
 
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <windows.h>
 #include "../console.hpp"
@@ -17,7 +18,7 @@ extern progress<int> beginning();
 extern progress<int> loadsave();
 
 extern void gameCycle();
-extern progress<int> studio();
+extern progress<int> studio(Console& c);
 
 
 #endif

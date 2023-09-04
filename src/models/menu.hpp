@@ -10,10 +10,15 @@ public:
 	std::vector<std::string> items;
 	int y = 0;
 	int selection = 0;
+	bool hasReturn = false;
 	std::string title;
 
-	Menu(std::vector<std::string> items, int y, int selection, std::string title = "") :
-		items(items), y(y), selection(selection), title(title) {}
+	Menu(std::vector<std::string> items, int y, int selection = 0, std::string title = "", bool hasReturn = false) :
+		items(items), y(y), selection(selection), title(title), hasReturn(hasReturn) {}
+
+	Menu(std::vector<std::string> items, int y, bool hasReturn) :
+		items(items), y(y), hasReturn(hasReturn) {}
+
 
 	~Menu() {
 		items.clear();
@@ -22,10 +27,10 @@ public:
 
 class TerminalSize {
 public:
-	short rows;
-	short cols;
+	int rows;
+	int cols;
 
-	TerminalSize(short c, short r) : cols(c), rows(r) {}
+	TerminalSize(int c, int r) : cols(c), rows(r) {}
 	~TerminalSize() = default;
 
 };

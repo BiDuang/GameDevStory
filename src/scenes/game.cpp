@@ -3,10 +3,11 @@
 GameData instance;
 
 void gameCycle() {
+	auto c = Console();
 	while (true) {
-		auto result = studio();
+		auto result = studio(c);
 		if (result.info == 0)
-			instance.RoundDev();
+			instance.RoundDev(c);
 	}
 }
 
@@ -19,6 +20,16 @@ progress<int> beginning() {
 		c.SetColor();
 		std::string name;
 		std::getline(std::cin, name);
+		name = trim(name);
+		if (name.empty()) {
+			c.Clear();
+			c.SetColor(Console::red);
+			std::cout << "工作室名称不能为空！" << std::endl;
+			c.SetColor(Console::blue);
+			std::cout << "请重试。" << std::endl;
+			c.SetColor();
+			continue;
+		}
 		if (name.size() > 16) {
 			c.Clear();
 			c.SetColor(Console::red);
@@ -32,20 +43,19 @@ progress<int> beginning() {
 		std::cout << "好的，你的工作室名称为: " << instance.GetStudio().name << std::endl;
 		std::cout << "是这样吗？" << std::endl << std::endl;
 		auto result = printMenu(Menu({ "是，就这个了","否，我再想想" }, 5, 0), c);
-		if (result == 0) return progress<int>(true, false);
+		if (result == 0) return progress<int>(true);
 		else c.Clear();
 	}
 }
 
 progress<int> loadsave() {
 
-	return progress<int>(true, false);
+	return progress<int>(true);
 }
 
-progress<int> createGame() {
-	auto c = Console();
+progress<int> createGame(Console& c) {
 	c.Clear();
-	c.GotoXY(0, 0);
+	c.GotoXY();
 
 	std::string name;
 	while (true) {
@@ -53,6 +63,16 @@ progress<int> createGame() {
 		std::cout << "为你的新游戏决定一个名字：";
 		c.SetColor();
 		std::getline(std::cin, name);
+		name = trim(name);
+		if (name.empty()) {
+			c.Clear();
+			c.SetColor(Console::red);
+			std::cout << "游戏名称不能为空！" << std::endl;
+			c.SetColor(Console::blue);
+			std::cout << "请重试。" << std::endl;
+			c.SetColor();
+			continue;
+		}
 		if (name.size() > 16) {
 			c.Clear();
 			c.SetColor(Console::red);
@@ -60,15 +80,11 @@ progress<int> createGame() {
 			c.SetColor(Console::blue);
 			std::cout << "请重试。" << std::endl;
 			c.SetColor();
+			continue;
 		}
-		else {
-			c.Clear();
-			c.GotoXY(0, 0);
-			std::cout << "为你的新游戏决定一个名字：" << name;
-			break;
-		}
-	}
+		break;
 
+	}
 
 	c.GotoXY(0, 1);
 	c.SetColor(Console::yellow);
@@ -81,19 +97,19 @@ progress<int> createGame() {
 	switch (gameType)
 	{
 	case 0:
-		std::cout << "你将开发一款动作游戏。";
+		std::cout << "你将开发一款 动作游戏。";
 		break;
 	case 1:
-		std::cout << "你将开发一款冒险游戏。";
+		std::cout << "你将开发一款 冒险游戏。";
 		break;
 	case 2:
-		std::cout << "你将开发一款养成游戏。";
+		std::cout << "你将开发一款 养成游戏。";
 		break;
 	case 3:
-		std::cout << "你将开发一款射击游戏。";
+		std::cout << "你将开发一款 射击游戏。";
 		break;
 	case 4:
-		std::cout << "你将开发一款音乐游戏。";
+		std::cout << "你将开发一款 音乐游戏。";
 		break;
 	}
 	c.SetColor();
@@ -127,16 +143,63 @@ progress<int> createGame() {
 
 	auto confirm = printMenu(Menu({ "是","否" }, 4, 0, "确认要开始制作新游戏吗? 这将花费 $5000 作为立项经费。"), c);
 	if (confirm == 0) {
-		instance.RoundDev();
-		instance.workingProduct = Product(name, instance.day, Platform(platform));
+		instance.RoundDev(c);
+		instance.workingProduct = Product(name, instance.day, Platform(platform), GameType(gameType));
 		instance.isDeveloping = true;
+		instance.money -= 5000;
 	}
-	return progress<int>(true, false);
+	return progress<int>(true);
+}
+
+progress<int> setDevPlan(Console& c) {
+	std::string s1 = "调整开发速度", name;
+	s1 += instance.isFastDev ? "为\"普通开发\"" : "为\"加急开发\"";
+	switch (printMenu(Menu({ "更改游戏名称",s1,"返回" }, 15, true), c))
+	{
+	case 0:
+		c.Clear();
+		c.GotoXY();
+		while (true) {
+			c.SetColor(Console::yellow);
+			std::cout << "为你开发中的游戏更换一个名字：";
+			c.SetColor();
+			std::getline(std::cin, name);
+			name = trim(name);
+			if (name.empty()) {
+				c.Clear();
+				c.SetColor(Console::red);
+				std::cout << "游戏名称不能为空！" << std::endl;
+				c.SetColor(Console::blue);
+				std::cout << "请重试。" << std::endl;
+				c.SetColor();
+				continue;
+			}
+			if (name.size() > 16) {
+				c.Clear();
+				c.SetColor(Console::red);
+				std::cout << "游戏名称不能超过16个字符（每个汉字算 2 个字符），你的 \"" << name << "\" 超过了这一限制！" << std::endl;
+				c.SetColor(Console::blue);
+				std::cout << "请重试。" << std::endl;
+				c.SetColor();
+				continue;
+			}
+			break;
+		}
+		instance.workingProduct.value().name = name;
+		break;
+	case 1:
+		if (instance.isFastDev) printMenu(Menu({ "好的" }, 15, 0, "开发速度已被调整为普通速度。"), c);
+		else printMenu(Menu({ "好的" }, 15, 0, "开发速度已被调整为加急，这将在加快游戏开发进程的同时牺牲品质"), c);
+		instance.isFastDev = !instance.isFastDev;
+		break;
+	case 2:
+		return progress<int>(true);
+	}
+	return progress<int>(true);
 }
 
 
-progress<int> studio() {
-	auto c = Console();
+progress<int> studio(Console& c) {
 	c.Clear();
 #pragma region Sidebars
 	for (int i = 0; i < 14; i++) {
@@ -269,6 +332,12 @@ progress<int> studio() {
 		std::cout << "[ 开发进度 ] ";
 		c.GotoXY(97, 7);
 		std::cout << instance.GetDevProgress() << "%";
+		if (instance.isFastDev) {
+			c.GotoXY(103, 7);
+			c.SetColor(Console::light_red);
+			std::cout << "加急开发";
+			c.SetColor();
+		}
 		c.GotoXY(93, 9);
 		std::cout << "[ 作品数据 ] ";
 		c.GotoXY(93, 10);
@@ -291,29 +360,79 @@ progress<int> studio() {
 #pragma endregion
 #pragma region CommandPanel
 	c.GotoXY(0, 14);
-	auto result = printMenu(Menu({ "下一回合","项目管理","员工管理","设置菜单" }, 15, 0), c);
+	auto result = printMenu(Menu({ "下一回合","项目管理","员工管理","工作室管理","设置菜单" }, 15), c);
 	c.Clear(0, 14, 120, 20);
 	int subResult;
 	switch (result) {
 	case 0:
 		if (instance.noConfirm) return progress<int>(true, true, 0);
-		subResult = printMenu(Menu({ "是","否" }, 15, 0, "确定要进入下一回合吗？"), c);
-		if (subResult == 0) return progress<int>(true, true, 0);
+		if (printMenu(Menu({ "是","否" }, 15, 0, "确定要进入下一回合吗？"), c) == 0) return progress<int>(true, true, 0);
 		return progress<int>(true, true, -1);
 	case 1:
-		subResult = printMenu(Menu({ "制作新游戏","调整项目计划","发布游戏","返回" }, 15, 0), c);
+		subResult = printMenu(Menu({ "制作新游戏","调整项目计划","发布游戏","返回" }, 15, true), c);
 		switch (subResult)
 		{
 		case 0:
-			createGame();
+			createGame(c);
+			break;
+		case 1:
+			if (instance.isDeveloping)
+				setDevPlan(c);
+			else
+				printMenu(Menu({ "好的" }, 15, 0, "当前没有正在开发的项目！"), c);
+			break;
+		case 2:
+			if (instance.workingProduct.value().isFinished)
+			{
+				instance.workingProduct.value().publishDay = instance.day;
+				instance.PublishProduct();
+			}
+			else
+				printMenu(Menu({ "好的" }, 15, 0, "游戏还没有制作完成，不能发售！"), c);
+			break;
 		}
 		break;
 	case 2:
-		subResult = printMenu(Menu({ "人才市场","猎头挖角","员工菜单","返回" }, 15, 0), c);
+		subResult = printMenu(Menu({ "人才市场","猎头挖角","员工菜单","返回" }, 15, true), c);
 		break;
 	case 3:
-		subResult = printMenu(Menu({ "保存游戏","游戏设置","退出游戏","返回" }, 15, 0), c);
+		subResult = printMenu(Menu({ "休假","工作室设置","返回" }, 15, true), c);
+		switch (subResult)
+		{
+		case 0:
+			if (!printMenu(Menu({ "是","否" }, 15, 0, "确定要给工作室放一天假吗？这为每位员工恢复35点心情。"), c))
+			{
+				printMenu(Menu({ "好的" }, 15, 0,
+					instance.TakeADayOff() ? "工作室休了一天假，所有员工都好好歇了一口气。" : "今天上过班了，已经不算休假了。"), c);
+			}
+			break;
+		}
+		break;
+	case 4:
+		subResult = printMenu(Menu({ "保存游戏","游戏设置","退出游戏","返回" }, 15, true), c);
+		std::string s1, s2;
+		auto flag = true;
 		switch (subResult) {
+		case 1:
+
+			while (flag) {
+				s1 = "自动确认操作: ", s2 = "每日自动保存: ";
+				s1 += instance.noConfirm ? "是" : "否";
+				s2 += instance.isAutoSave ? "是" : "否";
+				switch (printMenu(Menu({ s1,s2,"返回" }, 15, true), c))
+				{
+				case 0:
+					instance.noConfirm = !instance.noConfirm;
+					break;
+				case 1:
+					instance.isAutoSave = !instance.isAutoSave;
+					break;
+				case 2:
+					flag = false;
+					break;
+				}
+			}
+			break;
 		case 2:
 			exit(0);
 		}
