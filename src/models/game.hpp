@@ -48,7 +48,7 @@ public:
 		name(name), createDay(createDay), platform(platform), gameType(gameType) {}
 
 	bool PublishProduct() {
-		if (!isFinished || inSale) return false;
+		/*if (!isFinished || inSale) return false;*/
 		inSale = true;
 
 		switch (gameType)
@@ -194,7 +194,7 @@ public:
 	}
 
 	void PublishProduct() {
-		if (!(workingProduct.has_value() && workingProduct.value().isFinished)) return;
+		if (!(workingProduct.has_value()/* && workingProduct.value().isFinished*/)) return;
 		workingProduct.value().PublishProduct();
 		//TODO: finishedProducts didn't save a value, still empty
 		GetStudio().finishedProducts.push_back(workingProduct.value());
