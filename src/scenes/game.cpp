@@ -382,7 +382,7 @@ progress<int> studio(Console& c) {
 				printMenu(Menu({ "好的" }, 15, 0, "当前没有正在开发的项目！"), c);
 			break;
 		case 2:
-			if (/*instance.workingProduct.value().isFinished*/1)
+			if (instance.workingProduct.value().isFinished)
 			{
 				instance.workingProduct.value().publishDay = instance.day;
 				instance.PublishProduct();
