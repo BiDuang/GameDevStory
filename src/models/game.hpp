@@ -142,6 +142,10 @@ public:
 };
 
 class Studio {
+
+	Studio(const Studio&) = delete;
+	Studio& operator = (const Studio&) = delete;
+
 public:
 	std::string name;
 	std::vector<Stuff> stuffs;
@@ -165,25 +169,23 @@ public:
 	bool isDeveloping = false;
 	int money = 0;
 	std::optional<Product> workingProduct = std::nullopt;
-	std::optional<Studio> studio = std::nullopt;
+	Studio studio;
 
 	GameData() = default;
 
-	GameData(std::string studioName) {
-		studio = Studio(studioName);
+	GameData(const std::string& studioName)
+		: studio(studioName)
+	{
 		money = 50000;
 	}
 
-	Studio GetStudio() {
-		if (!studio.has_value()) {
-			throw std::exception("Studio is not initialized");
-		}
-		return studio.value();
+	Studio& GetStudio() {
+		return studio;
 	}
 
 	bool TakeADayOff() {
 		if (stage == 0) {
-			for (auto& stuff : studio.value().stuffs) {
+			for (auto& stuff : studio.stuffs) {
 				if (stuff.happiness <= 65) stuff.happiness += 35;
 				else stuff.happiness = 100;
 			}
@@ -224,7 +226,7 @@ public:
 					printMenu(Menu({ "好的" }, 15, 0, "你的项目 \"" + s1 + "\" 已经制作完成了，你可以选择现在发布或者继续调试增加稳定性。"), c);
 					workingProduct.value().isFinished = true;
 				}
-				for (auto& stuff : studio.value().stuffs) {
+				for (auto& stuff : studio.stuffs) {
 					if (!stuff.roundWork() || stuff.job != programmer) continue;
 					workingProduct.value().stability += randint(0, stuff.program / 2);
 				}
@@ -232,7 +234,7 @@ public:
 			else {
 				bool isWork = false;
 
-				for (auto& stuff : studio.value().stuffs) {
+				for (auto& stuff : studio.stuffs) {
 					if (!stuff.roundWork()) continue;
 					isWork = true;
 					switch (stuff.job)
