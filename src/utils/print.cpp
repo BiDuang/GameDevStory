@@ -14,7 +14,7 @@ std::string& trim(std::string& s)
 	return s;
 }
 
-bool printAsciiImage(std::string path, bool is_utf8) {
+bool printAsciiImage(const std::string& path, bool is_utf8) {
 	if (is_utf8) {
 		std::locale::global(std::locale("en_US.UTF8"));
 	}

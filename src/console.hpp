@@ -136,6 +136,22 @@ public:
 		}
 	}
 
+	int GetCursorY() {
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		GetConsoleScreenBufferInfo(handle_, &csbi);
+		return csbi.dwCursorPosition.Y;
+	}
+
+	void Print(const std::string& text, Colors color = white, Colors bg_color = black) {
+		SetColor(color, bg_color);
+		std::cout << text;
+		SetColor();
+	}
+
+	void Pause() {
+		_getch();
+	}
+
 	ArrowCommands static GetArrowCommand(bool hasReturn = false) {
 		int ch = _getch();
 		while (ch != esc) {

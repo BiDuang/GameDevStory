@@ -5,6 +5,9 @@
 #include <string>
 #include <random>
 #include <vector>
+#include <list>
+#include <map>
+#include <numeric>
 
 #include <optional>
 
@@ -26,6 +29,8 @@ enum GameType
 };
 
 class Product {
+private:
+	unsigned long long lastSales = 0;
 public:
 	std::string name;
 	int createDay;
@@ -39,13 +44,16 @@ public:
 	GameType gameType;
 
 	unsigned long long sales = 0;
-	unsigned long long profit = 0;
 	unsigned long long gamePoint = 0;
 	bool isFinished = false;
 	bool inSale = false;
 
-	Product(std::string name, int createDay, Platform platform, GameType gameType) :
+	Product(const std::string& name, int createDay, Platform platform, GameType gameType) :
 		name(name), createDay(createDay), platform(platform), gameType(gameType) {}
+
+	unsigned long long GetSalesReport() const {
+		return sales - lastSales;
+	}
 
 	bool PublishProduct() {
 		if (!isFinished || inSale) return false;
@@ -72,6 +80,13 @@ public:
 		return true;
 	}
 
+	static std::vector<Product> GetInSaleProds(const std::vector<Product>& prods) {
+		std::vector<Product> ret;
+		for (auto& p : prods) {
+			if (p.inSale)	ret.push_back(p);
+		}
+		return ret;
+	}
 };
 
 enum JobType {
@@ -126,7 +141,6 @@ public:
 			design *= 2;
 			break;
 		}
-
 		salary = randint(1500, (program + art + audio + design) > 15 ? ((program + art + audio + design) * 100) : 1600);
 		happiness = 100;
 	}
@@ -141,6 +155,81 @@ public:
 	}
 };
 
+class FinancialReport {
+public:
+	int day = 0;
+	std::map<std::string, unsigned long long> prodSales;
+	std::map<int, int> stuffSalary;
+	int otherCost = 0;
+
+	FinancialReport() :prodSales({}), stuffSalary({}) {}
+	FinancialReport(int day, const std::vector<Product>& prod, const std::vector<Stuff>& empy) :day(day) {
+		for (auto& p : prod) {
+			prodSales[p.name] = p.GetSalesReport();
+		}
+		for (auto& e : empy) {
+			stuffSalary[e.id] = e.salary;
+		}
+	}
+
+	void PrintReport(Console& c) {
+		c.Clear();
+		c.GotoXY();
+		for (int i = 0; i < 117; i++) {
+			std::cout << "=";
+		}
+		c.GotoXY(0, 1);
+		c.SetColor(Console::light_yellow);
+		std::cout << day / 7 << " 周财务报告";
+		c.SetColor();
+		c.GotoXY(0, 3);
+		c.Print("[+] 游戏销售", Console::light_blue);
+		if (prodSales.empty())
+		{
+			c.GotoXY(0, 2 + c.GetCursorY());
+			c.Print("这周工作室没有卖出任何游戏", Console::gray);
+		}
+		else
+		{
+			for (auto& p : prodSales) {
+				std::cout << p.first << "\t销量: " << p.second << std::endl;
+			}
+		}
+		c.GotoXY(0, 2 + c.GetCursorY());
+
+		c.Print("[-] 员工工资", Console::light_magenta);
+		c.GotoXY(0, 1 + c.GetCursorY());
+		if (stuffSalary.empty()) {
+			c.GotoXY(0, 1 + c.GetCursorY());
+			c.Print("这周工作室没有发放任何薪水", Console::gray);
+		}
+		else {
+			for (auto& s : stuffSalary) {
+				std::cout << "员工编号: " << s.first << "\t薪水: " << s.second << std::endl;
+			}
+		}
+		c.GotoXY(0, 2 + c.GetCursorY());
+
+		c.Print("[-] 其他开销", Console::light_magenta);
+		c.GotoXY(0, 1 + c.GetCursorY());
+		std::cout << "工作室运营基本资金, 平台授权费等: " << otherCost;
+		c.GotoXY(0, 2 + c.GetCursorY());
+
+		c.Print("[=] 总计", Console::light_green);
+		c.GotoXY(0, 1 + c.GetCursorY());
+		std::cout << "总收入: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) << std::endl;
+		std::cout << "总支出: " << std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) + otherCost << std::endl;
+		std::cout << "总利润: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) - std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) - otherCost;
+		c.GotoXY(0, 2 + c.GetCursorY());
+		for (int i = 0; i < 117; i++) {
+			std::cout << "=";
+		}
+		c.GotoXY(0, 1 + c.GetCursorY());
+		c.Print("按任意键离开报告页面...", Console::gray);
+		c.Pause();
+	}
+};
+
 class Studio {
 
 	Studio(const Studio&) = delete;
@@ -150,8 +239,9 @@ public:
 	std::string name;
 	std::vector<Stuff> stuffs;
 	std::vector<Product> finishedProducts;
+	FinancialReport financialReport;
 
-	Studio(std::string name) : name(name) {
+	Studio(const std::string& name) : name(name), financialReport() {
 		stuffs = { Stuff(0,programmer,0), Stuff(0,artist,1), Stuff(0,musician,2), Stuff(0,designer,3) };
 		finishedProducts = std::vector<Product>();
 	}
@@ -161,13 +251,12 @@ class GameData {
 private:
 	int devProgress = 0;
 public:
-	int day = 0;
+	int day = 1;
 	short stage = 0;
 	bool noConfirm = false;
 	bool isAutoSave = true;
 	bool isFastDev = false;
-	bool isDeveloping = false;
-	int money = 0;
+	long long money = 0;
 	std::optional<Product> workingProduct = std::nullopt;
 	Studio studio;
 
@@ -177,10 +266,6 @@ public:
 		: studio(studioName)
 	{
 		money = 50000;
-	}
-
-	Studio& GetStudio() {
-		return studio;
 	}
 
 	bool TakeADayOff() {
@@ -196,30 +281,32 @@ public:
 	}
 
 	void PublishProduct() {
-		if (!(workingProduct.has_value() && workingProduct.value().isFinished)) return;
+		if (workingProduct.has_value() && !workingProduct.value().isFinished) return;
 		workingProduct.value().PublishProduct();
-		//TODO: finishedProducts didn't save a value, still empty
-		GetStudio().finishedProducts.push_back(workingProduct.value());
+		studio.finishedProducts.push_back(workingProduct.value());
 		workingProduct = std::nullopt;
 		devProgress = 0;
-		isDeveloping = false;
 	}
 
 
 	void Selling() {
-		for (auto& p : GetStudio().finishedProducts) {
+		for (auto& p : studio.finishedProducts) {
 			auto releasedDays = day - p.publishDay;
 			if (releasedDays >= 45) { p.inSale = false; continue; }
-			p.sales = (unsigned long long)(randint(p.gamePoint / 3.0, p.gamePoint * 10) * (1 - (releasedDays / 45.0)));
-
+			p.sales = (unsigned long long)(randint(p.gamePoint / 5.0, p.gamePoint * (1 - (releasedDays / 45.0)) * 10));
+			money += p.sales * 4 * ((long long)p.platform + 1);
 
 		}
 	}
 
+	void WeekSet(Console& c) {
+		money -= 5000ULL * (day / 14);
+		studio.financialReport = FinancialReport(day, Product::GetInSaleProds(studio.finishedProducts), studio.stuffs);
+	}
+
 	bool RoundDev(Console& c) {
 		stage++;
-		if (isDeveloping) {
-
+		if (workingProduct.has_value()) {
 			if (devProgress >= 100) {
 				if (!workingProduct.value().isFinished) {
 					std::string s1 = workingProduct.value().name;

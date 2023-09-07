@@ -12,7 +12,7 @@
 #include "../models/game.hpp"
 
 extern void openning();
-extern void mainMenu(std::string version);
+extern void mainMenu(const std::string& version);
 
 extern progress<int> beginning();
 extern progress<int> loadsave();

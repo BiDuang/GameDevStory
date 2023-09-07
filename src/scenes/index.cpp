@@ -1,7 +1,7 @@
 #include "main.hpp"
 
 void openning() {
-	auto c = Console();
+	Console c;
 	c.SetColor(Console::Colors::light_blue);
 	printAsciiImage("src/ascii_images/author.txt");
 	Sleep(3000);
@@ -9,8 +9,8 @@ void openning() {
 	c.SetColor();
 }
 
-void mainMenu(std::string version) {
-	auto c = Console();
+void mainMenu(const std::string& version) {
+	Console c;
 	c.SetColor(Console::Colors::cyan);
 	printAsciiImage("src/ascii_images/title.txt");
 	c.SetColor();

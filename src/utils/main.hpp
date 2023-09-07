@@ -8,7 +8,7 @@
 #include "../console.hpp"
 
 extern std::string& trim(std::string& s);
-extern bool printAsciiImage(std::string path, bool is_utf8 = false);
+extern bool printAsciiImage(const std::string& path, bool is_utf8 = false);
 extern int randint(int min, int max);
 extern int printMenu(Menu m, Console& c);
 

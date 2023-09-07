@@ -18,11 +18,6 @@ public:
 
 	Menu(std::vector<std::string> items, int y, bool hasReturn) :
 		items(items), y(y), hasReturn(hasReturn) {}
-
-
-	~Menu() {
-		items.clear();
-	}
 };
 
 class TerminalSize {

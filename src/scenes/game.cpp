@@ -7,13 +7,16 @@ void gameCycle() {
 	Console c;
 	while (true) {
 		auto result = studio(c);
-		if (result.info == 0)
+		if (result.info == 0) {
 			instance->RoundDev(c);
+			if (instance->day % 7 == 0 && instance->stage == 0) instance->WeekSet(c);
+		}
+
 	}
 }
 
 progress<int> beginning() {
-	auto c = Console();
+	Console c;
 	c.Clear();
 	while (true) {
 		c.SetColor(Console::yellow);
@@ -41,7 +44,7 @@ progress<int> beginning() {
 			continue;
 		}
 		instance = std::make_unique<GameData>(name);
-		std::cout << "好的，你的工作室名称为: " << instance->GetStudio().name << std::endl;
+		std::cout << "好的，你的工作室名称为: " << instance->studio.name << std::endl;
 		std::cout << "是这样吗？" << std::endl << std::endl;
 		auto result = printMenu(Menu({ "是，就这个了","否，我再想想" }, 5, 0), c);
 		if (result == 0) return progress<int>(true);
@@ -146,7 +149,6 @@ progress<int> createGame(Console& c) {
 	if (confirm == 0) {
 		instance->RoundDev(c);
 		instance->workingProduct = Product(name, instance->day, Platform(platform), GameType(gameType));
-		instance->isDeveloping = true;
 		instance->money -= 5000;
 	}
 	return progress<int>(true);
@@ -243,7 +245,7 @@ progress<int> studio(Console& c) {
 	c.GotoXY(0, 3);
 	std::cout << "[ 工作室名称 ] ";
 	c.GotoXY(4, 4);
-	std::cout << instance->GetStudio().name;
+	std::cout << instance->studio.name;
 	c.GotoXY(18, 4);
 	std::cout << " 工作室";
 	c.GotoXY(0, 6);
@@ -255,7 +257,7 @@ progress<int> studio(Console& c) {
 	c.GotoXY(0, 9);
 	std::cout << "[ 工作室状态 ] ";
 	c.GotoXY(2, 10);
-	if (instance->isDeveloping) {
+	if (instance->workingProduct.has_value()) {
 		c.SetColor(Console::Colors::light_green);
 		std::cout << "正在开发:" << instance->workingProduct.value().name;
 	}
@@ -268,9 +270,9 @@ progress<int> studio(Console& c) {
 	c.GotoXY(0, 12);
 	std::cout << "[ 历史信息 ] ";
 	c.GotoXY(4, 13);
-	if (instance->GetStudio().finishedProducts.size() != 0) {
+	if (instance->studio.finishedProducts.size() != 0) {
 		c.SetColor(Console::Colors::light_magenta);
-		std::cout << "已发布了 " << instance->GetStudio().finishedProducts.size() << "件作品";
+		std::cout << "已发布了 " << instance->studio.finishedProducts.size() << "件作品";
 	}
 	else {
 		c.SetColor(Console::Colors::gray);
@@ -288,7 +290,7 @@ progress<int> studio(Console& c) {
 	c.SetColor(Console::Colors::light_cyan);
 	std::cout << "  编号    编程    美工    音乐    策划    心情    月薪  ";
 	c.SetColor();
-	if (instance->GetStudio().stuffs.size() == 0) {
+	if (instance->studio.stuffs.size() == 0) {
 		c.GotoXY(33, 7);
 		c.SetColor(Console::gray);
 		std::cout << "当前没有雇佣任何员工！";
@@ -296,7 +298,7 @@ progress<int> studio(Console& c) {
 	}
 	else {
 		int i = 7;
-		for (auto& stuff : instance->GetStudio().stuffs) {
+		for (auto& stuff : instance->studio.stuffs) {
 			c.GotoXY(33, i);
 			std::cout << stuff.id;
 			c.GotoXY(41, i);
@@ -323,7 +325,7 @@ progress<int> studio(Console& c) {
 	c.GotoXY(90, 1);
 	std::cout << " 产品进度";
 	c.GotoXY(90, 3);
-	if (instance->isDeveloping)
+	if (instance->workingProduct.has_value())
 	{
 		c.GotoXY(93, 3);
 		std::cout << "[ 作品名称 ] ";
@@ -374,10 +376,14 @@ progress<int> studio(Console& c) {
 		switch (subResult)
 		{
 		case 0:
+			if (instance->workingProduct.has_value()) {
+				printMenu(Menu({ "好的" }, 15, 0, "当前已经有一个正在开发的项目了"), c);
+				break;
+			}
 			createGame(c);
 			break;
 		case 1:
-			if (instance->isDeveloping)
+			if (instance->workingProduct.has_value())
 				setDevPlan(c);
 			else
 				printMenu(Menu({ "好的" }, 15, 0, "当前没有正在开发的项目！"), c);
@@ -397,7 +403,7 @@ progress<int> studio(Console& c) {
 		subResult = printMenu(Menu({ "人才市场","猎头挖角","员工菜单","返回" }, 15, true), c);
 		break;
 	case 3:
-		subResult = printMenu(Menu({ "休假","工作室设置","返回" }, 15, true), c);
+		subResult = printMenu(Menu({ "休假","上周财报","工作室设置","返回" }, 15, true), c);
 		switch (subResult)
 		{
 		case 0:
@@ -406,6 +412,10 @@ progress<int> studio(Console& c) {
 				printMenu(Menu({ "好的" }, 15, 0,
 					instance->TakeADayOff() ? "工作室休了一天假，所有员工都好好歇了一口气。" : "今天上过班了，已经不算休假了。"), c);
 			}
+			break;
+		case 1:
+			if (instance->day < 7) printMenu(Menu({ "好的" }, 15, 0, "第一周结束后才有财报"), c);
+			else instance->studio.financialReport.PrintReport(c);
 			break;
 		}
 		break;
