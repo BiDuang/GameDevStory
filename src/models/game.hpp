@@ -8,6 +8,9 @@
 #include <list>
 #include <map>
 #include <numeric>
+#include <fstream>
+#include <time.h>
+#include <filesystem>
 
 #include <optional>
 
@@ -141,7 +144,7 @@ public:
 			design *= 2;
 			break;
 		}
-		salary = randint(1500, (program + art + audio + design) > 15 ? ((program + art + audio + design) * 100) : 1600);
+		salary = randint(200, (program + art + audio + design) > 100 ? ((program + art + audio + design) * 10) : 1000);
 		happiness = 100;
 	}
 
@@ -260,12 +263,18 @@ public:
 	std::optional<Product> workingProduct = std::nullopt;
 	Studio studio;
 
-	GameData() = default;
+	GameData() = delete;
 
 	GameData(const std::string& studioName)
 		: studio(studioName)
 	{
 		money = 50000;
+	}
+
+	static void Save(const GameData& instance) {
+		if (!std::filesystem::exists("save")) std::filesystem::create_directory("save");
+		std::filesystem::path path = "save/" + std::to_string(instance.day) + "_" + std::to_string(time(NULL)) + ".save";
+		//TODO£ºSave the gamedata into a file
 	}
 
 	bool TakeADayOff() {
@@ -293,14 +302,14 @@ public:
 		for (auto& p : studio.finishedProducts) {
 			auto releasedDays = day - p.publishDay;
 			if (releasedDays >= 45) { p.inSale = false; continue; }
-			p.sales = (unsigned long long)(randint(p.gamePoint / 5.0, p.gamePoint * (1 - (releasedDays / 45.0)) * 10));
-			money += p.sales * 4 * ((long long)p.platform + 1);
+			p.sales = (unsigned long long)(randint(p.gamePoint / 10.0, (p.gamePoint * (1 - (releasedDays / 45.0))) * (day / (14.0))));
+			money += p.sales * 3 * ((long long)p.platform + 1);
 
 		}
 	}
 
 	void WeekSet(Console& c) {
-		money -= 5000ULL * (day / 14);
+		money -= std::accumulate(studio.stuffs.begin(), studio.stuffs.end(), 0, [](int a, Stuff b) {return a + b.salary; });
 		studio.financialReport = FinancialReport(day, Product::GetInSaleProds(studio.finishedProducts), studio.stuffs);
 	}
 
@@ -327,33 +336,33 @@ public:
 					switch (stuff.job)
 					{
 					case programmer:
-						workingProduct.value().graphics += randint(0, stuff.art / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().playability += randint(0, stuff.design / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().stability += randint(0, stuff.program / 2);
+						workingProduct.value().graphics += randint(0, stuff.art / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().playability += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().stability += randint(0, stuff.program / 4);
 						break;
 					case artist:
-						workingProduct.value().graphics += randint(0, stuff.art / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().playability += randint(0, stuff.design / 2);
-						workingProduct.value().sound += randint(0, stuff.audio / 2);
-						workingProduct.value().interesting += randint(0, stuff.design / 2);
+						workingProduct.value().graphics += randint(0, stuff.art / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().playability += randint(0, stuff.design / 4);
+						workingProduct.value().sound += randint(0, stuff.audio / 4);
+						workingProduct.value().interesting += randint(0, stuff.design / 4);
 						break;
 					case musician:
-						workingProduct.value().playability += randint(0, stuff.design / 2);
-						workingProduct.value().sound += randint(0, stuff.audio / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().interesting += randint(0, stuff.design / 2);
+						workingProduct.value().playability += randint(0, stuff.design / 4);
+						workingProduct.value().sound += randint(0, stuff.audio / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().interesting += randint(0, stuff.design / 4);
 						break;
 					case designer:
-						workingProduct.value().graphics += randint(0, stuff.art / 2);
-						workingProduct.value().playability += randint(0, stuff.design / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().interesting += randint(0, stuff.design / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().sound += randint(0, stuff.audio / 2);
+						workingProduct.value().graphics += randint(0, stuff.art / 4);
+						workingProduct.value().playability += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().interesting += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().sound += randint(0, stuff.audio / 4);
 						break;
 					case almighty:
-						workingProduct.value().graphics += randint(0, stuff.art / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().playability += randint(0, stuff.design / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().interesting += randint(0, stuff.design / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().sound += randint(0, stuff.audio / 2) * (stuff.happiness > 90 ? 2 : 1);
-						workingProduct.value().stability += randint(0, stuff.program / 2) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().graphics += randint(0, stuff.art / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().playability += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().interesting += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().sound += randint(0, stuff.audio / 4) * (stuff.happiness > 90 ? 2 : 1);
+						workingProduct.value().stability += randint(0, stuff.program / 4) * (stuff.happiness > 90 ? 2 : 1);
 						break;
 					}
 				}

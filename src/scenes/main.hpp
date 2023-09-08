@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <memory>
 #include <windows.h>
 #include "../console.hpp"
 #include "../utils/main.hpp"

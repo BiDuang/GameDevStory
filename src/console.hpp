@@ -149,7 +149,7 @@ public:
 	}
 
 	void Pause() {
-		_getch();
+		getchar();
 	}
 
 	ArrowCommands static GetArrowCommand(bool hasReturn = false) {

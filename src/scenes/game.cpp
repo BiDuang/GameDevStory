@@ -1,5 +1,4 @@
 #include "main.hpp"
-#include <memory>
 
 std::unique_ptr<GameData> instance;
 
@@ -205,11 +204,11 @@ progress<int> setDevPlan(Console& c) {
 progress<int> studio(Console& c) {
 	c.Clear();
 #pragma region Sidebars
-	for (int i = 0; i < 14; i++) {
+	for (int i = 0; i < 15; i++) {
 		c.GotoXY(28, i);
 		std::cout << "|";
 	}
-	for (int i = 0; i < 14; i++) {
+	for (int i = 0; i < 15; i++) {
 		c.GotoXY(88, i);
 		std::cout << "|";
 	}
@@ -288,7 +287,7 @@ progress<int> studio(Console& c) {
 	std::cout << " 员工信息";
 	c.GotoXY(30, 3);
 	c.SetColor(Console::Colors::light_cyan);
-	std::cout << "  编号    编程    美工    音乐    策划    心情    月薪  ";
+	std::cout << "  编号    编程    美工    音乐    策划    心情    周薪  ";
 	c.SetColor();
 	if (instance->studio.stuffs.size() == 0) {
 		c.GotoXY(33, 7);
@@ -389,13 +388,13 @@ progress<int> studio(Console& c) {
 				printMenu(Menu({ "好的" }, 15, 0, "当前没有正在开发的项目！"), c);
 			break;
 		case 2:
-			if (instance->workingProduct.value().isFinished)
+			if (instance->workingProduct.has_value() && instance->workingProduct.value().isFinished)
 			{
 				instance->workingProduct.value().publishDay = instance->day;
 				instance->PublishProduct();
 			}
 			else
-				printMenu(Menu({ "好的" }, 15, 0, "游戏还没有制作完成，不能发售！"), c);
+				printMenu(Menu({ "好的" }, 15, 0, instance->workingProduct.has_value() ? "游戏还没有制作完成，不能发售！" : "没有任何游戏可以发售！"), c);
 			break;
 		}
 		break;
@@ -424,6 +423,9 @@ progress<int> studio(Console& c) {
 		std::string s1, s2;
 		auto flag = true;
 		switch (subResult) {
+		case 0:
+			GameData::Save(*instance);
+			break;
 		case 1:
 
 			while (flag) {
