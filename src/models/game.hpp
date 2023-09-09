@@ -14,6 +14,25 @@
 
 #include <optional>
 
+// TODO: 把函数写在这里实在是很难看，之后改一改
+inline void WriteStringToFile(FILE* f, const std::string & str)
+{
+	size_t len = str.length();
+	fwrite(&len, sizeof(len), 1, f);
+	fwrite(str.c_str(), len * sizeof(char), 1, f);
+}
+inline std::string ReadStringFromFile(FILE* f)
+{
+	size_t strlength = 0;
+	fread(&strlength, sizeof(strlength), 1, f);
+
+	std::string str;
+	str.resize(strlength);
+	fread(str.data(), strlength * sizeof(char), 1, f);
+
+	return str;
+}
+
 enum Platform {
 	PC,
 	Mobile,
@@ -33,6 +52,8 @@ enum GameType
 
 class Product {
 private:
+	Product() = default;
+
 	unsigned long long lastSales = 0;
 public:
 	std::string name;
@@ -53,6 +74,51 @@ public:
 
 	Product(const std::string& name, int createDay, Platform platform, GameType gameType) :
 		name(name), createDay(createDay), platform(platform), gameType(gameType) {}
+
+	static Product LoadImpl(FILE* f)
+	{
+		Product p;
+		p.name = ReadStringFromFile(f);
+		fread(&p.lastSales, sizeof(p.lastSales), 1, f);
+		fread(&p.createDay, sizeof(p.createDay), 1, f);
+		fread(&p.publishDay, sizeof(p.publishDay), 1, f);
+		fread(&p.interesting, sizeof(p.interesting), 1, f);
+		fread(&p.playability, sizeof(p.playability), 1, f);
+
+		fread(&p.graphics, sizeof(p.graphics), 1, f);
+		fread(&p.sound, sizeof(p.sound), 1, f);
+		fread(&p.stability, sizeof(p.stability), 1, f);
+		fread(&p.platform, sizeof(p.platform), 1, f);
+
+		fread(&p.gameType, sizeof(p.gameType), 1, f);
+		fread(&p.sales, sizeof(p.sales), 1, f);
+		fread(&p.gamePoint, sizeof(p.gamePoint), 1, f);
+		fread(&p.isFinished, sizeof(p.isFinished), 1, f);
+		fread(&p.inSale, sizeof(p.inSale), 1, f);
+
+		return p;
+	}
+	void SaveImpl(FILE* f)
+	{
+		WriteStringToFile(f, name);
+
+		fwrite(&lastSales, sizeof(lastSales), 1, f);
+		fwrite(&createDay, sizeof(createDay), 1, f);
+		fwrite(&publishDay, sizeof(publishDay), 1, f);
+		fwrite(&interesting, sizeof(interesting), 1, f);
+		fwrite(&playability, sizeof(playability), 1, f);
+
+		fwrite(&graphics, sizeof(graphics), 1, f);
+		fwrite(&sound, sizeof(sound), 1, f);
+		fwrite(&stability, sizeof(stability), 1, f);
+		fwrite(&platform, sizeof(platform), 1, f);
+
+		fwrite(&gameType, sizeof(gameType), 1, f);
+		fwrite(&sales, sizeof(sales), 1, f);
+		fwrite(&gamePoint, sizeof(gamePoint), 1, f);
+		fwrite(&isFinished, sizeof(isFinished), 1, f);
+		fwrite(&inSale, sizeof(inSale), 1, f);
+	}
 
 	unsigned long long GetSalesReport() const {
 		return sales - lastSales;
@@ -110,6 +176,8 @@ public:
 	int happiness = 0;
 	int salary = 0;
 	JobType job;
+
+	Stuff() = default;
 
 	Stuff(int id, int program, int art, int audio,
 		int design, int happiness, int salary, JobType job) :
@@ -231,6 +299,65 @@ public:
 		c.Print("按任意键离开报告页面...", Console::gray);
 		c.Pause();
 	}
+
+	static FinancialReport LoadImpl(FILE* f)
+	{
+		FinancialReport p;
+		fread(&p.day, sizeof(p.day), 1, f);
+
+		size_t prod_sales_count = 0;
+		fread(&prod_sales_count, sizeof(prod_sales_count), 1, f);
+	
+		for (size_t i = 0; i < prod_sales_count; ++i)
+		{
+			auto key = ReadStringFromFile(f);
+			decltype(p.prodSales)::value_type::second_type val;
+			fread(&val, sizeof(val), 1, f);
+			p.prodSales[key] = val;
+		}
+
+		size_t stuff_salary_count = 0;
+		fread(&stuff_salary_count, sizeof(stuff_salary_count), 1, f);
+
+		for (size_t i = 0; i < stuff_salary_count; ++i)
+		{
+			decltype(p.stuffSalary)::key_type key;
+			decltype(p.stuffSalary)::key_type val;
+
+			fread(&key, sizeof(key), 1, f);
+			fread(&val, sizeof(val), 1, f);
+
+			p.stuffSalary[key] = val;
+		}
+
+		fread(&p.otherCost, sizeof(otherCost), 1, f);
+
+		return p;
+	}
+	void SaveImpl(FILE* f)
+	{
+		fwrite(&day, sizeof(day), 1, f);
+		
+		size_t prod_sales_count = prodSales.size();
+		fwrite(&prod_sales_count, sizeof(prod_sales_count), 1, f);
+
+		for (auto& [key, val] : prodSales)
+		{
+			WriteStringToFile(f, key);
+			fwrite(&val, sizeof(val), 1, f);
+		}
+
+		size_t stuff_salary_count = stuffSalary.size();
+		fwrite(&stuff_salary_count, sizeof(stuff_salary_count), 1, f);
+
+		for (auto& [key, val] : stuffSalary)
+		{
+			fwrite(&key, sizeof(key), 1, f);
+			fwrite(&val, sizeof(val), 1, f);
+		}
+
+		fwrite(&otherCost, sizeof(otherCost), 1, f);
+	}
 };
 
 class Studio {
@@ -247,6 +374,47 @@ public:
 	Studio(const std::string& name) : name(name), financialReport() {
 		stuffs = { Stuff(0,programmer,0), Stuff(0,artist,1), Stuff(0,musician,2), Stuff(0,designer,3) };
 		finishedProducts = std::vector<Product>();
+	}
+
+	void LoadImpl(FILE* f)
+	{
+		name = ReadStringFromFile(f);
+
+		size_t stuffs_len = 0;
+		fread(&stuffs_len, sizeof(stuffs_len), 1, f);
+		for (size_t i = 0; i < stuffs_len; ++i)
+		{
+			static_assert(std::is_standard_layout<Stuff>::value);
+			stuffs.push_back({});
+
+			fread(&stuffs.back(), sizeof(decltype(stuffs)::value_type), 1, f);
+		}
+
+		size_t prod_len = 0;
+		fread(&prod_len, sizeof(prod_len), 1, f);
+		for (size_t i = 0; i < prod_len; ++i)
+		{
+			finishedProducts.push_back(Product::LoadImpl(f));
+		}
+	}
+	void SaveImpl(FILE* f)
+	{
+		WriteStringToFile(f, name);
+
+		size_t stuffs_len = stuffs.size();
+		fwrite(&stuffs_len, sizeof(stuffs_len), 1, f);
+		for (auto& stuff : stuffs)
+		{
+			static_assert(std::is_standard_layout<Stuff>::value);
+			fwrite(&stuff, sizeof(stuff), 1, f);
+		}
+
+		size_t prod_len = finishedProducts.size();
+		fwrite(&prod_len, sizeof(prod_len), 1, f);
+		for (auto& prod : finishedProducts)
+		{
+			prod.SaveImpl(f);
+		}
 	}
 };
 
@@ -271,10 +439,79 @@ public:
 		money = 50000;
 	}
 
-	static void Save(const GameData& instance) {
-		if (!std::filesystem::exists("save")) std::filesystem::create_directory("save");
-		std::filesystem::path path = "save/" + std::to_string(instance.day) + "_" + std::to_string(time(NULL)) + ".save";
-		//TODO：Save the gamedata into a file
+	enum class SavingResult
+	{
+		OK,
+		FILE_EXIST,
+		FAILED,
+	};
+
+	bool TryLoading(const std::filesystem::path& saving_file_path)
+	{
+		std::error_code ec = {};
+		// NOTE: 使用error_code，不然如果文件系统库操作失败会丢异常，规避异常机制的使用
+		if (std::filesystem::exists(saving_file_path, ec))
+			return false;
+
+		FILE* saving = fopen(saving_file_path.string().c_str(), "rb");
+		if (saving == nullptr)
+			// 无法打开文件以保存，返回错误
+			return false;
+
+		// 开写！
+		fread(&devProgress, sizeof(devProgress), 1, saving);
+		fread(&day, sizeof(day), 1, saving);
+		fread(&stage, sizeof(stage), 1, saving);
+		fread(&noConfirm, sizeof(noConfirm), 1, saving);
+		fread(&isAutoSave, sizeof(isAutoSave), 1, saving);
+		fread(&isFastDev, sizeof(isFastDev), 1, saving);
+		fread(&money, sizeof(money), 1, saving);
+
+		bool has_working_product = false;
+		fread(&has_working_product, sizeof(has_working_product), 1, saving);
+		if (has_working_product)
+		{
+			workingProduct = std::make_optional(Product::LoadImpl(saving));
+		}
+		studio.LoadImpl(saving);
+
+		fclose(saving);
+
+		return true;
+	}
+
+	SavingResult TrySaving(const std::filesystem::path& saving_file_path, bool force) 
+	{
+		std::error_code ec = {};
+		// NOTE: 使用error_code，不然如果文件系统库操作失败会丢异常，规避异常机制的使用
+		if (force == false && std::filesystem::exists(saving_file_path, ec))
+			return SavingResult::FILE_EXIST;
+	
+		FILE* saving = fopen(saving_file_path.string().c_str(), "wb");
+		if (saving == nullptr)
+			// 无法打开文件以保存，返回错误
+			return SavingResult::FAILED;
+
+		// 开写！
+		fwrite(&devProgress, sizeof(devProgress), 1, saving);
+		fwrite(&day, sizeof(day), 1, saving);
+		fwrite(&stage, sizeof(stage), 1, saving);
+		fwrite(&noConfirm, sizeof(noConfirm), 1, saving);
+		fwrite(&isAutoSave, sizeof(isAutoSave), 1, saving);
+		fwrite(&isFastDev, sizeof(isFastDev), 1, saving);
+		fwrite(&money, sizeof(money), 1, saving);
+
+		bool has_working_product = workingProduct.has_value();
+		fwrite(&has_working_product, sizeof(has_working_product), 1, saving);
+		if (has_working_product)
+		{
+			workingProduct.value().SaveImpl(saving);
+		}
+		studio.SaveImpl(saving);
+
+		fclose(saving);
+
+		return SavingResult::OK;
 	}
 
 	bool TakeADayOff() {
