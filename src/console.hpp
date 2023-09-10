@@ -14,32 +14,32 @@ private:
 
 public:
 	enum Colors {
-		black = 0,
-		blue = 1,
-		green = 2,
-		cyan = 3,
-		red = 4,
-		magenta = 5,
-		yellow = 6,
-		white = 7,
-		gray = 8,
-		light_blue = 9,
-		light_green = 10,
-		light_cyan = 11,
-		light_red = 12,
-		light_magenta = 13,
-		light_yellow = 14,
-		bright_white = 15
+		Black = 0,
+		Blue = 1,
+		Green = 2,
+		Cyan = 3,
+		Red = 4,
+		Magenta = 5,
+		Yellow = 6,
+		White = 7,
+		Gray = 8,
+		LightBlue = 9,
+		LightGreen = 10,
+		LightCyan = 11,
+		LightRed = 12,
+		LightMagenta = 13,
+		LightYellow = 14,
+		BrightWhite = 15
 	};
 
 	enum ArrowCommands {
-		up = 72,
-		down = 80,
-		left = 75,
-		right = 77,
-		enter = 13,
-		backspace = 8,
-		esc = 27
+		Up = 72,
+		Down = 80,
+		Left = 75,
+		Right = 77,
+		Enter = 13,
+		Backspace = 8,
+		ESC = 27
 	};
 
 	Console() {
@@ -48,6 +48,11 @@ public:
 
 	void GotoXY() {
 		COORD c = { 0,0 };
+		SetConsoleCursorPosition(handle_, c);
+	}
+
+	void MoveX(short x) {
+		COORD c{ x,GetCursorY() };
 		SetConsoleCursorPosition(handle_, c);
 	}
 
@@ -94,19 +99,17 @@ public:
 		SetConsoleCursorPosition(handle_, topLeft);
 	}
 
-	void SetColor(const Colors f_color, const Colors bg_color = black) const {
+	void SetColor(const Colors f_color, const Colors bg_color = Black) const {
 		SetConsoleTextAttribute(handle_, f_color | bg_color << 4);
 	}
 
 	void SetColor() const {
-		SetConsoleTextAttribute(handle_, white);
+		SetConsoleTextAttribute(handle_, White);
 	}
 
 	void MenuRender(Menu m) {
 		GotoXY(0, m.y);
-		for (int i = 0; i < 117; i++) {
-			std::cout << "=";
-		}
+		for (int i = 0; i < 117; i++) std::cout << "=";
 
 		GotoXY(4, m.y + 1);
 		if (m.title != "") {
@@ -119,7 +122,7 @@ public:
 		for (auto& i : m.items)
 		{
 			if (total_rended == m.selection) {
-				SetColor(yellow, gray);
+				SetColor(Yellow, Gray);
 				std::cout << " > " << i << " ";
 				SetColor();
 			}
@@ -131,9 +134,7 @@ public:
 
 		}
 		GotoXY(0, m.y + 1 + total_rended);
-		for (int i = 0; i < 117; i++) {
-			std::cout << "=";
-		}
+		for (int i = 0; i < 117; i++) std::cout << "=";
 	}
 
 	int GetCursorY() {
@@ -142,33 +143,37 @@ public:
 		return csbi.dwCursorPosition.Y;
 	}
 
-	void Print(const std::string& text, Colors color = white, Colors bg_color = black) {
+	void Endl() {
+		GotoXY(0, GetCursorY() + 1);
+	}
+
+	void Print(const std::string& text, Colors color = White, Colors bg_color = Black) {
 		SetColor(color, bg_color);
 		std::cout << text;
 		SetColor();
 	}
 
 	void Pause() {
-		getchar();
+		auto _ = getchar();
 	}
 
 	ArrowCommands static GetArrowCommand(bool hasReturn = false) {
 		int ch = _getch();
-		while (ch != esc) {
+		while (ch != ESC) {
 			switch (ch) {
-			case up:
-				return up;
-			case down:
-				return down;
-			case left:
-				return left;
-			case right:
-				return right;
-			case enter:
-				return enter;
-			case backspace:
+			case Up:
+				return Up;
+			case Down:
+				return Down;
+			case Left:
+				return Left;
+			case Right:
+				return Right;
+			case Enter:
+				return Enter;
+			case Backspace:
 				if (hasReturn)
-					return backspace;
+					return Backspace;
 				else
 					ch = _getch();
 				break;
@@ -177,7 +182,7 @@ public:
 				break;
 			}
 		}
-		return esc;
+		return ESC;
 	}
 };
 

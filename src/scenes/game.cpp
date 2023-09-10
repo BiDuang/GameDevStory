@@ -18,7 +18,7 @@ progress<int> beginning() {
 	Console c;
 	c.Clear();
 	while (true) {
-		c.SetColor(Console::yellow);
+		c.SetColor(Console::Yellow);
 		std::cout << "请为你的工作室决定一个名字: ";
 		c.SetColor();
 		std::string name;
@@ -26,23 +26,24 @@ progress<int> beginning() {
 		name = trim(name);
 		if (name.empty()) {
 			c.Clear();
-			c.SetColor(Console::red);
+			c.SetColor(Console::Red);
 			std::cout << "工作室名称不能为空！" << std::endl;
-			c.SetColor(Console::blue);
+			c.SetColor(Console::Blue);
 			std::cout << "请重试。" << std::endl;
 			c.SetColor();
 			continue;
 		}
 		if (name.size() > 16) {
 			c.Clear();
-			c.SetColor(Console::red);
+			c.SetColor(Console::Red);
 			std::cout << "工作室名称不能超过16个字符（每个汉字算 2 个字符），你的 \"" << name << "\" 超过了这一限制！" << std::endl;
-			c.SetColor(Console::blue);
+			c.SetColor(Console::Blue);
 			std::cout << "请重试。" << std::endl;
 			c.SetColor();
 			continue;
 		}
 		instance = std::make_unique<GameData>(name);
+
 		std::cout << "好的，你的工作室名称为: " << instance->studio.name << std::endl;
 		std::cout << "是这样吗？" << std::endl << std::endl;
 		auto result = printMenu(Menu({ "是，就这个了","否，我再想想" }, 5, 0), c);
@@ -52,7 +53,7 @@ progress<int> beginning() {
 }
 
 progress<int> loadsave() {
-
+	instance = std::make_unique<GameData>(std::filesystem::path("save/1.save"));
 	return progress<int>(true);
 }
 
@@ -62,25 +63,25 @@ progress<int> createGame(Console& c) {
 
 	std::string name;
 	while (true) {
-		c.SetColor(Console::yellow);
+		c.SetColor(Console::Yellow);
 		std::cout << "为你的新游戏决定一个名字：";
 		c.SetColor();
 		std::getline(std::cin, name);
 		name = trim(name);
 		if (name.empty()) {
 			c.Clear();
-			c.SetColor(Console::red);
+			c.SetColor(Console::Red);
 			std::cout << "游戏名称不能为空！" << std::endl;
-			c.SetColor(Console::blue);
+			c.SetColor(Console::Blue);
 			std::cout << "请重试。" << std::endl;
 			c.SetColor();
 			continue;
 		}
 		if (name.size() > 16) {
 			c.Clear();
-			c.SetColor(Console::red);
+			c.SetColor(Console::Red);
 			std::cout << "游戏名称不能超过16个字符（每个汉字算 2 个字符），你的 \"" << name << "\" 超过了这一限制！" << std::endl;
-			c.SetColor(Console::blue);
+			c.SetColor(Console::Blue);
 			std::cout << "请重试。" << std::endl;
 			c.SetColor();
 			continue;
@@ -90,13 +91,13 @@ progress<int> createGame(Console& c) {
 	}
 
 	c.GotoXY(0, 1);
-	c.SetColor(Console::yellow);
+	c.SetColor(Console::Yellow);
 	std::cout << "为你的新游戏决定一个类型：";
 	c.SetColor();
 	auto gameType = printMenu(Menu({ "动作游戏","冒险游戏","养成游戏","射击游戏","音乐游戏" }, 2, 0), c);
 	c.Clear(0, 1, 120, 20);
 	c.GotoXY(0, 1);
-	c.SetColor(Console::light_blue);
+	c.SetColor(Console::LightBlue);
 	switch (gameType)
 	{
 	case 0:
@@ -118,12 +119,12 @@ progress<int> createGame(Console& c) {
 	c.SetColor();
 
 	c.GotoXY(0, 3);
-	c.SetColor(Console::yellow);
+	c.SetColor(Console::Yellow);
 	std::cout << "你的游戏将在哪个平台上发售：";
 	auto platform = printMenu(Menu({ "PC","Mobile","XCase","Zwitch","PS114514" }, 4, 0), c);
 	c.Clear(0, 2, 120, 20);
 	c.GotoXY(0, 2);
-	c.SetColor(Console::light_blue);
+	c.SetColor(Console::LightBlue);
 	switch (platform)
 	{
 	case 0:
@@ -162,25 +163,25 @@ progress<int> setDevPlan(Console& c) {
 		c.Clear();
 		c.GotoXY();
 		while (true) {
-			c.SetColor(Console::yellow);
+			c.SetColor(Console::Yellow);
 			std::cout << "为你开发中的游戏更换一个名字：";
 			c.SetColor();
 			std::getline(std::cin, name);
 			name = trim(name);
 			if (name.empty()) {
 				c.Clear();
-				c.SetColor(Console::red);
+				c.SetColor(Console::Red);
 				std::cout << "游戏名称不能为空！" << std::endl;
-				c.SetColor(Console::blue);
+				c.SetColor(Console::Blue);
 				std::cout << "请重试。" << std::endl;
 				c.SetColor();
 				continue;
 			}
 			if (name.size() > 16) {
 				c.Clear();
-				c.SetColor(Console::red);
+				c.SetColor(Console::Red);
 				std::cout << "游戏名称不能超过16个字符（每个汉字算 2 个字符），你的 \"" << name << "\" 超过了这一限制！" << std::endl;
-				c.SetColor(Console::blue);
+				c.SetColor(Console::Blue);
 				std::cout << "请重试。" << std::endl;
 				c.SetColor();
 				continue;
@@ -196,6 +197,76 @@ progress<int> setDevPlan(Console& c) {
 		break;
 	case 2:
 		return progress<int>(true);
+	}
+	return progress<int>(true);
+}
+
+progress<int> jobFair(Console& c) {
+	c.Clear();
+	c.GotoXY();
+	for (int i = 0; i < 117; i++) std::cout << "=";
+	c.Endl();
+	c.Print("人才市场", Console::Blue);
+	c.Endl();
+	for (int i = 0; i < 117; i++) std::cout << "=";
+	c.Endl();
+	std::vector<Stuff> jobSeekers = { Stuff(instance->day, JobType::Programmer, -1),Stuff(instance->day,JobType::Musician,-1),
+		Stuff(instance->day,JobType::Artist,-1), Stuff(instance->day,JobType::Designer,-1) };
+	if (randint(0, 100) < 15) jobSeekers[randint(0, 3)] = Stuff(instance->day, JobType::Almighty, -1);
+	c.Print("你每天可以免费进入一次人才市场寻找求职者，之后每次进入需要支付 $1000", Console::Yellow);
+	c.Endl();
+	c.Print("你的工作室最多可以雇用 4 名员工，你可以将已有的员工辞退以招聘新的员工。");
+	c.GotoXY(30, c.GetCursorY() + 2);
+	c.SetColor(Console::Colors::LightCyan);
+	std::cout << "  职业    编程    美工    音乐    策划    心情    周薪  ";
+	for (auto& stuff : jobSeekers) {
+		c.Endl();
+		for (int i = 0; i < 109; i++) std::cout << "-";
+		c.Endl();
+		switch (stuff.job) {
+		case JobType::Programmer:
+			c.Print("程序", Console::LightCyan);
+			break;
+		case JobType::Musician:
+			c.Print("音乐", Console::Blue);
+			break;
+		case JobType::Artist:
+			c.Print("美术", Console::Magenta);
+			break;
+		case JobType::Designer:
+			c.Print("策划", Console::LightRed);
+			break;
+		case JobType::Almighty:
+			c.Print("全能", Console::Yellow);
+			break;
+		}
+
+		c.MoveX(33);
+		std::cout << stuff.id;
+		c.MoveX(41);
+		std::cout << stuff.program;
+		c.MoveX(49);
+		std::cout << stuff.art;
+		c.MoveX(57);
+		std::cout << stuff.audio;
+		c.MoveX(65);
+		std::cout << stuff.design;
+		c.MoveX(73);
+		std::cout << stuff.happiness;
+		c.MoveX(81);
+		std::cout << stuff.salary;
+	}
+	c.Endl();
+	for (int i = 0; i < 109; i++) std::cout << "-";
+	c.Endl();
+	auto selection = printMenu(Menu({ "招聘 1 号", "招聘 2 号","招聘 3 号","招聘 4 号","离开人才市场" }, 15, 0, "下一步做什么？"), c);
+	switch (selection) {
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		printMenu(Menu({ "好的" }, 15, 0, instance->studio.HireStuff(jobSeekers[selection]) ? "招聘成功。" : "招聘失败，你的工作室已满！"), c);
+		break;
 	}
 	return progress<int>(true);
 }
@@ -218,7 +289,7 @@ progress<int> studio(Console& c) {
 #pragma region DayPanel
 	std::cout << "===========================" << std::endl;
 	std::cout << "> Day ";
-	c.SetColor(Console::Colors::cyan);
+	c.SetColor(Console::Colors::Cyan);
 	std::cout << instance->day;
 	c.SetColor();
 	c.GotoXY(11, 1);
@@ -226,11 +297,11 @@ progress<int> studio(Console& c) {
 
 	for (int i = 0; i < 4; i++) {
 		if (i != instance->stage) {
-			c.SetColor(Console::Colors::gray);
+			c.SetColor(Console::Colors::Gray);
 			std::cout << "=  ";
 		}
 		else {
-			c.SetColor(Console::Colors::light_yellow);
+			c.SetColor(Console::Colors::LightYellow);
 			std::cout << "[=]  ";
 		}
 	}
@@ -250,19 +321,19 @@ progress<int> studio(Console& c) {
 	c.GotoXY(0, 6);
 	std::cout << "[ 资金 ] ";
 	c.GotoXY(4, 7);
-	c.SetColor(Console::Colors::yellow);
+	c.SetColor(Console::Colors::Yellow);
 	std::cout << "$ " << instance->money;
 	c.SetColor();
 	c.GotoXY(0, 9);
 	std::cout << "[ 工作室状态 ] ";
 	c.GotoXY(2, 10);
 	if (instance->workingProduct.has_value()) {
-		c.SetColor(Console::Colors::light_green);
+		c.SetColor(Console::Colors::LightGreen);
 		std::cout << "正在开发:" << instance->workingProduct.value().name;
 	}
 	else {
 		c.GotoXY(4, 10);
-		c.SetColor(Console::Colors::gray);
+		c.SetColor(Console::Colors::Gray);
 		std::cout << "空闲中...";
 	}
 	c.SetColor();
@@ -270,11 +341,11 @@ progress<int> studio(Console& c) {
 	std::cout << "[ 历史信息 ] ";
 	c.GotoXY(4, 13);
 	if (instance->studio.finishedProducts.size() != 0) {
-		c.SetColor(Console::Colors::light_magenta);
+		c.SetColor(Console::Colors::LightMagenta);
 		std::cout << "已发布了 " << instance->studio.finishedProducts.size() << "件作品";
 	}
 	else {
-		c.SetColor(Console::Colors::gray);
+		c.SetColor(Console::Colors::Gray);
 		std::cout << "等待发布工作室首部作品";
 	}
 	c.SetColor();
@@ -286,12 +357,12 @@ progress<int> studio(Console& c) {
 	c.GotoXY(30, 1);
 	std::cout << " 员工信息";
 	c.GotoXY(30, 3);
-	c.SetColor(Console::Colors::light_cyan);
+	c.SetColor(Console::Colors::LightCyan);
 	std::cout << "  编号    编程    美工    音乐    策划    心情    周薪  ";
 	c.SetColor();
 	if (instance->studio.stuffs.size() == 0) {
 		c.GotoXY(33, 7);
-		c.SetColor(Console::gray);
+		c.SetColor(Console::Gray);
 		std::cout << "当前没有雇佣任何员工！";
 		c.SetColor();
 	}
@@ -336,7 +407,7 @@ progress<int> studio(Console& c) {
 		std::cout << instance->GetDevProgress() << "%";
 		if (instance->isFastDev) {
 			c.GotoXY(103, 7);
-			c.SetColor(Console::light_red);
+			c.SetColor(Console::LightRed);
 			std::cout << "加急开发";
 			c.SetColor();
 		}
@@ -355,7 +426,7 @@ progress<int> studio(Console& c) {
 	}
 	else {
 		c.GotoXY(93, 7);
-		c.SetColor(Console::gray);
+		c.SetColor(Console::Gray);
 		std::cout << "当前没有正在开发的项目！";
 		c.SetColor();
 	}
@@ -399,7 +470,29 @@ progress<int> studio(Console& c) {
 		}
 		break;
 	case 2:
-		subResult = printMenu(Menu({ "人才市场","猎头挖角","员工菜单","返回" }, 15, true), c);
+		subResult = printMenu(Menu({ "人才市场","\"降本增效\"","返回" }, 15, true), c);
+		switch (subResult) {
+		case 0:
+			jobFair(c);
+			break;
+		case 1:
+			if (instance->studio.stuffs.empty())
+			{
+				printMenu(Menu({ "好的" }, 15, 0, "你的工作室已经没有任何员工了！"), c);
+				break;
+			}
+			std::vector<std::string> options;
+			for (auto i = 1; i <= instance->studio.stuffs.size(); i++)
+			{
+				std::string str = "开除 ";
+				str += std::to_string(instance->studio.stuffs[i - 1].id) + " 号员工";
+				options.push_back(str);
+			}
+			options.push_back("返回");
+			auto result = printMenu(Menu(options, 15, true), c);
+			if (result != options.size() - 1) instance->studio.FireStuff(result);
+			break;
+		}
 		break;
 	case 3:
 		subResult = printMenu(Menu({ "休假","上周财报","工作室设置","返回" }, 15, true), c);
@@ -424,7 +517,7 @@ progress<int> studio(Console& c) {
 		auto flag = true;
 		switch (subResult) {
 		case 0:
-			GameData::Save(*instance);
+			instance->TrySaving(std::filesystem::path("save/1.save"), true);
 			break;
 		case 1:
 

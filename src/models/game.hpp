@@ -11,27 +11,7 @@
 #include <fstream>
 #include <time.h>
 #include <filesystem>
-
 #include <optional>
-
-// TODO: 把函数写在这里实在是很难看，之后改一改
-inline void WriteStringToFile(FILE* f, const std::string & str)
-{
-	size_t len = str.length();
-	fwrite(&len, sizeof(len), 1, f);
-	fwrite(str.c_str(), len * sizeof(char), 1, f);
-}
-inline std::string ReadStringFromFile(FILE* f)
-{
-	size_t strlength = 0;
-	fread(&strlength, sizeof(strlength), 1, f);
-
-	std::string str;
-	str.resize(strlength);
-	fread(str.data(), strlength * sizeof(char), 1, f);
-
-	return str;
-}
 
 enum Platform {
 	PC,
@@ -56,16 +36,16 @@ private:
 
 	unsigned long long lastSales = 0;
 public:
-	std::string name;
-	int createDay;
+	std::string name = "";
+	int createDay = 0;
 	int publishDay = 0;
 	int interesting = 0;
 	int playability = 0;
 	int graphics = 0;
 	int sound = 0;
 	int stability = 0;
-	Platform platform;
-	GameType gameType;
+	Platform platform = PC;
+	GameType gameType = Action;
 
 	unsigned long long sales = 0;
 	unsigned long long gamePoint = 0;
@@ -159,11 +139,11 @@ public:
 };
 
 enum JobType {
-	programmer,
-	artist,
-	musician,
-	designer,
-	almighty
+	Programmer,
+	Artist,
+	Musician,
+	Designer,
+	Almighty
 };
 
 class Stuff {
@@ -175,7 +155,7 @@ public:
 	int design = 0;
 	int happiness = 0;
 	int salary = 0;
-	JobType job;
+	JobType job = Programmer;
 
 	Stuff() = default;
 
@@ -193,19 +173,19 @@ public:
 
 		switch (job)
 		{
-		case programmer:
+		case Programmer:
 			program *= 2;
 			break;
-		case artist:
+		case Artist:
 			art *= 2;
 			break;
-		case musician:
+		case Musician:
 			audio *= 2;
 			break;
-		case designer:
+		case Designer:
 			design *= 2;
 			break;
-		case almighty:
+		case Almighty:
 			program *= 2;
 			art *= 2;
 			audio *= 2;
@@ -246,19 +226,17 @@ public:
 	void PrintReport(Console& c) {
 		c.Clear();
 		c.GotoXY();
-		for (int i = 0; i < 117; i++) {
-			std::cout << "=";
-		}
+		for (int i = 0; i < 117; i++) std::cout << "=";
 		c.GotoXY(0, 1);
-		c.SetColor(Console::light_yellow);
+		c.SetColor(Console::LightYellow);
 		std::cout << day / 7 << " 周财务报告";
 		c.SetColor();
 		c.GotoXY(0, 3);
-		c.Print("[+] 游戏销售", Console::light_blue);
+		c.Print("[+] 游戏销售", Console::LightBlue);
 		if (prodSales.empty())
 		{
 			c.GotoXY(0, 2 + c.GetCursorY());
-			c.Print("这周工作室没有卖出任何游戏", Console::gray);
+			c.Print("这周工作室没有卖出任何游戏", Console::Gray);
 		}
 		else
 		{
@@ -268,11 +246,11 @@ public:
 		}
 		c.GotoXY(0, 2 + c.GetCursorY());
 
-		c.Print("[-] 员工工资", Console::light_magenta);
+		c.Print("[-] 员工工资", Console::LightMagenta);
 		c.GotoXY(0, 1 + c.GetCursorY());
 		if (stuffSalary.empty()) {
 			c.GotoXY(0, 1 + c.GetCursorY());
-			c.Print("这周工作室没有发放任何薪水", Console::gray);
+			c.Print("这周工作室没有发放任何薪水", Console::Gray);
 		}
 		else {
 			for (auto& s : stuffSalary) {
@@ -281,22 +259,20 @@ public:
 		}
 		c.GotoXY(0, 2 + c.GetCursorY());
 
-		c.Print("[-] 其他开销", Console::light_magenta);
+		c.Print("[-] 其他开销", Console::LightMagenta);
 		c.GotoXY(0, 1 + c.GetCursorY());
 		std::cout << "工作室运营基本资金, 平台授权费等: " << otherCost;
 		c.GotoXY(0, 2 + c.GetCursorY());
 
-		c.Print("[=] 总计", Console::light_green);
+		c.Print("[=] 总计", Console::LightGreen);
 		c.GotoXY(0, 1 + c.GetCursorY());
 		std::cout << "总收入: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) << std::endl;
 		std::cout << "总支出: " << std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) + otherCost << std::endl;
 		std::cout << "总利润: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) - std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) - otherCost;
 		c.GotoXY(0, 2 + c.GetCursorY());
-		for (int i = 0; i < 117; i++) {
-			std::cout << "=";
-		}
+		for (int i = 0; i < 117; i++) std::cout << "=";
 		c.GotoXY(0, 1 + c.GetCursorY());
-		c.Print("按任意键离开报告页面...", Console::gray);
+		c.Print("按任意键离开报告页面...", Console::Gray);
 		c.Pause();
 	}
 
@@ -307,7 +283,7 @@ public:
 
 		size_t prod_sales_count = 0;
 		fread(&prod_sales_count, sizeof(prod_sales_count), 1, f);
-	
+
 		for (size_t i = 0; i < prod_sales_count; ++i)
 		{
 			auto key = ReadStringFromFile(f);
@@ -337,7 +313,7 @@ public:
 	void SaveImpl(FILE* f)
 	{
 		fwrite(&day, sizeof(day), 1, f);
-		
+
 		size_t prod_sales_count = prodSales.size();
 		fwrite(&prod_sales_count, sizeof(prod_sales_count), 1, f);
 
@@ -371,9 +347,24 @@ public:
 	std::vector<Product> finishedProducts;
 	FinancialReport financialReport;
 
+	Studio() :name(""), stuffs({}), finishedProducts({}), financialReport() {}
+
 	Studio(const std::string& name) : name(name), financialReport() {
-		stuffs = { Stuff(0,programmer,0), Stuff(0,artist,1), Stuff(0,musician,2), Stuff(0,designer,3) };
+		stuffs = { Stuff(0,Programmer,0), Stuff(0,Artist,1), Stuff(0,Musician,2), Stuff(0,Designer,3) };
 		finishedProducts = std::vector<Product>();
+	}
+
+	bool HireStuff(Stuff newStuff) {
+		if (stuffs.size() >= 4) return false;
+		newStuff.id = stuffs.size();
+		stuffs.push_back(newStuff);
+	}
+
+	bool FireStuff(int id) {
+		if (stuffs.empty() || id > stuffs.size()) return false;
+		stuffs.erase(stuffs.begin() + id);
+		for (int i = id; i < stuffs.size(); i++) stuffs[i].id--;
+		return true;
 	}
 
 	void LoadImpl(FILE* f)
@@ -427,11 +418,14 @@ public:
 	bool noConfirm = false;
 	bool isAutoSave = true;
 	bool isFastDev = false;
+	bool isFairChecked = false;
 	long long money = 0;
 	std::optional<Product> workingProduct = std::nullopt;
 	Studio studio;
 
-	GameData() = delete;
+	GameData(std::filesystem::path savePath) {
+		TryLoading(savePath);
+	}
 
 	GameData(const std::string& studioName)
 		: studio(studioName)
@@ -450,7 +444,7 @@ public:
 	{
 		std::error_code ec = {};
 		// NOTE: 使用error_code，不然如果文件系统库操作失败会丢异常，规避异常机制的使用
-		if (std::filesystem::exists(saving_file_path, ec))
+		if (!std::filesystem::exists(saving_file_path, ec))
 			return false;
 
 		FILE* saving = fopen(saving_file_path.string().c_str(), "rb");
@@ -465,6 +459,7 @@ public:
 		fread(&noConfirm, sizeof(noConfirm), 1, saving);
 		fread(&isAutoSave, sizeof(isAutoSave), 1, saving);
 		fread(&isFastDev, sizeof(isFastDev), 1, saving);
+		fread(&isFairChecked, sizeof(isFairChecked), 1, saving);
 		fread(&money, sizeof(money), 1, saving);
 
 		bool has_working_product = false;
@@ -480,13 +475,13 @@ public:
 		return true;
 	}
 
-	SavingResult TrySaving(const std::filesystem::path& saving_file_path, bool force) 
+	SavingResult TrySaving(const std::filesystem::path& saving_file_path, bool force)
 	{
 		std::error_code ec = {};
 		// NOTE: 使用error_code，不然如果文件系统库操作失败会丢异常，规避异常机制的使用
 		if (force == false && std::filesystem::exists(saving_file_path, ec))
 			return SavingResult::FILE_EXIST;
-	
+
 		FILE* saving = fopen(saving_file_path.string().c_str(), "wb");
 		if (saving == nullptr)
 			// 无法打开文件以保存，返回错误
@@ -499,6 +494,7 @@ public:
 		fwrite(&noConfirm, sizeof(noConfirm), 1, saving);
 		fwrite(&isAutoSave, sizeof(isAutoSave), 1, saving);
 		fwrite(&isFastDev, sizeof(isFastDev), 1, saving);
+		fwrite(&isFairChecked, sizeof(isFairChecked), 1, saving);
 		fwrite(&money, sizeof(money), 1, saving);
 
 		bool has_working_product = workingProduct.has_value();
@@ -560,7 +556,7 @@ public:
 					workingProduct.value().isFinished = true;
 				}
 				for (auto& stuff : studio.stuffs) {
-					if (!stuff.roundWork() || stuff.job != programmer) continue;
+					if (!stuff.roundWork() || stuff.job != Programmer) continue;
 					workingProduct.value().stability += randint(0, stuff.program / 2);
 				}
 			}
@@ -572,29 +568,29 @@ public:
 					isWork = true;
 					switch (stuff.job)
 					{
-					case programmer:
+					case Programmer:
 						workingProduct.value().graphics += randint(0, stuff.art / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().playability += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().stability += randint(0, stuff.program / 4);
 						break;
-					case artist:
+					case Artist:
 						workingProduct.value().graphics += randint(0, stuff.art / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().playability += randint(0, stuff.design / 4);
 						workingProduct.value().sound += randint(0, stuff.audio / 4);
 						workingProduct.value().interesting += randint(0, stuff.design / 4);
 						break;
-					case musician:
+					case Musician:
 						workingProduct.value().playability += randint(0, stuff.design / 4);
 						workingProduct.value().sound += randint(0, stuff.audio / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().interesting += randint(0, stuff.design / 4);
 						break;
-					case designer:
+					case Designer:
 						workingProduct.value().graphics += randint(0, stuff.art / 4);
 						workingProduct.value().playability += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().interesting += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().sound += randint(0, stuff.audio / 4);
 						break;
-					case almighty:
+					case Almighty:
 						workingProduct.value().graphics += randint(0, stuff.art / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().playability += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);
 						workingProduct.value().interesting += randint(0, stuff.design / 4) * (stuff.happiness > 90 ? 2 : 1);

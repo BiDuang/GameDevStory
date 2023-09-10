@@ -35,17 +35,17 @@ int printMenu(Menu m, Console& c) {
 		c.MenuRender(m);
 		auto command = c.GetArrowCommand(m.hasReturn);
 		switch (command) {
-		case Console::up:
+		case Console::Up:
 			m.selection--;
 			break;
-		case Console::down:
+		case Console::Down:
 			m.selection++;
 			break;
-		case Console::enter:
+		case Console::Enter:
 			selected = true;
 			c.Clear(0, m.y, 120, m.items.size() + 2 + (!m.title.empty()));
 			return m.selection;
-		case Console::backspace:
+		case Console::Backspace:
 			selected = true;
 			c.Clear(0, m.y, 120, m.items.size() + 2 + (!m.title.empty()));
 			return m.items.size() - 1;
@@ -59,4 +59,5 @@ int printMenu(Menu m, Console& c) {
 			m.selection = 0;
 		}
 	}
+	return 0;
 }

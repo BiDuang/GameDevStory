@@ -6,6 +6,7 @@ int main()
 {
 	/*openning();*/
 	mainMenu("dev 1.5");
+	gameCycle();
 
 	return 0;
 }
