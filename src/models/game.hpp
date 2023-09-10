@@ -345,7 +345,7 @@ public:
 	std::string name;
 	std::vector<Stuff> stuffs;
 	std::vector<Product> finishedProducts;
-	FinancialReport financialReport;
+	FinancialReport financialReport;//TODO: Fix Load Error
 
 	Studio() :name(""), stuffs({}), finishedProducts({}), financialReport() {}
 
@@ -358,6 +358,7 @@ public:
 		if (stuffs.size() >= 4) return false;
 		newStuff.id = stuffs.size();
 		stuffs.push_back(newStuff);
+		return true;
 	}
 
 	bool FireStuff(int id) {

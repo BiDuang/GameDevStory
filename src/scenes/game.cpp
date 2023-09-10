@@ -202,6 +202,7 @@ progress<int> setDevPlan(Console& c) {
 }
 
 progress<int> jobFair(Console& c) {
+	instance->isFairChecked = true;
 	c.Clear();
 	c.GotoXY();
 	for (int i = 0; i < 117; i++) std::cout << "=";
@@ -217,12 +218,14 @@ progress<int> jobFair(Console& c) {
 	c.Endl();
 	c.Print("你的工作室最多可以雇用 4 名员工，你可以将已有的员工辞退以招聘新的员工。");
 	c.GotoXY(30, c.GetCursorY() + 2);
-	c.SetColor(Console::Colors::LightCyan);
+	c.SetColor(Console::Colors::Cyan);
 	std::cout << "  职业    编程    美工    音乐    策划    心情    周薪  ";
+	c.SetColor();
 	for (auto& stuff : jobSeekers) {
 		c.Endl();
 		for (int i = 0; i < 109; i++) std::cout << "-";
 		c.Endl();
+		c.MoveX(32);
 		switch (stuff.job) {
 		case JobType::Programmer:
 			c.Print("程序", Console::LightCyan);
@@ -240,9 +243,6 @@ progress<int> jobFair(Console& c) {
 			c.Print("全能", Console::Yellow);
 			break;
 		}
-
-		c.MoveX(33);
-		std::cout << stuff.id;
 		c.MoveX(41);
 		std::cout << stuff.program;
 		c.MoveX(49);
@@ -473,6 +473,9 @@ progress<int> studio(Console& c) {
 		subResult = printMenu(Menu({ "人才市场","\"降本增效\"","返回" }, 15, true), c);
 		switch (subResult) {
 		case 0:
+			if (instance->isFairChecked) if (printMenu(Menu({ "支付 $1000 以重新入场","返回" }, 15, 0, "你已经进入过人才市场了，是否要重新入场？"), c) == 0)
+				instance->money -= 1000;
+			else break;
 			jobFair(c);
 			break;
 		case 1:
