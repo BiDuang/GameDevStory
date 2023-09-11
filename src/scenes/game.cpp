@@ -8,9 +8,11 @@ void gameCycle() {
 		auto result = studio(c);
 		if (result.info == 0) {
 			instance->RoundDev(c);
-			if (instance->day % 7 == 0 && instance->stage == 0) instance->WeekSet(c);
+			if (instance->day % 7 == 0 && instance->stage == 0)
+			{
+				instance->WeekSet(c);
+			}
 		}
-
 	}
 }
 
@@ -53,7 +55,46 @@ progress<int> beginning() {
 }
 
 progress<int> loadsave() {
-	instance = std::make_unique<GameData>(std::filesystem::path("save/1.save"));
+	Console c;
+	c.Clear();
+	c.GotoXY();
+	c.Print("正在读取存档...", Console::LightCyan);
+	if (printMenu(Menu({ "使用自动存档文件","手动指定存档文件","退出游戏" }, 15, false), c) == 0) {
+		auto result = false;
+		instance = std::make_unique<GameData>(std::filesystem::path("save/autosave.save"), result);
+		if (!result) {
+			c.Endl();
+			c.Print("读取存档失败！", Console::Red);
+			exit(0);
+		}
+	}
+	else {
+		while (true) {
+			c.Print("请输入你的存档路径: ", Console::Yellow);
+			std::string path;
+			std::getline(std::cin, path);
+			path = trim(path);
+			if (path.empty()) {
+				c.Clear();
+				c.SetColor(Console::Red);
+				std::cout << "存档路径不能为空！" << std::endl;
+				c.SetColor(Console::Blue);
+				std::cout << "请重试。" << std::endl;
+				c.SetColor();
+			}
+			else {
+				auto result = false;
+				instance = std::make_unique<GameData>(std::filesystem::path(path), result);
+				if (!result) {
+					c.Endl();
+					c.Print("读取存档失败！", Console::Red);
+					exit(0);
+				}
+				break;
+			}
+		}
+	}
+
 	return progress<int>(true);
 }
 
@@ -195,8 +236,6 @@ progress<int> setDevPlan(Console& c) {
 		else printMenu(Menu({ "好的" }, 15, 0, "开发速度已被调整为加急，这将在加快游戏开发进程的同时牺牲品质"), c);
 		instance->isFastDev = !instance->isFastDev;
 		break;
-	case 2:
-		return progress<int>(true);
 	}
 	return progress<int>(true);
 }
@@ -271,6 +310,25 @@ progress<int> jobFair(Console& c) {
 	return progress<int>(true);
 }
 
+progress<bool> save(Console& c) {
+	c.Clear();
+	c.GotoXY();
+	c.Print("你想将存档存到哪里，请输入保存存档文件的完整路径： (输入 q 取消)");
+	c.Endl();
+	std::string savePath;
+	std::getline(std::cin, savePath);
+	if (savePath == "q") return progress<bool>(false);
+	auto result = instance->TrySaving(savePath, false);
+	if (result == GameData::SavingResult::FILE_EXIST)
+		if (printMenu(Menu({ "是的","不要" }, 15, 0, "文件已存在，是否覆盖？"), c) == 0)
+		{
+			result = instance->TrySaving(savePath, true);
+		}
+		else return progress<bool>(false);
+	c.Clear();
+	c.GotoXY();
+	return progress<bool>(result == GameData::SavingResult::OK);
+}
 
 progress<int> studio(Console& c) {
 	c.Clear();
@@ -520,10 +578,10 @@ progress<int> studio(Console& c) {
 		auto flag = true;
 		switch (subResult) {
 		case 0:
-			instance->TrySaving(std::filesystem::path("save/1.save"), true);
+			if (save(c).isOk) printMenu(Menu({ "好的" }, 15, 0, "保存成功！"), c);
+			else printMenu(Menu({ "好的" }, 15, 0, "保存失败！"), c);
 			break;
 		case 1:
-
 			while (flag) {
 				s1 = "自动确认操作: ", s2 = "每日自动保存: ";
 				s1 += instance->noConfirm ? "是" : "否";

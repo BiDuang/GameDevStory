@@ -1,3 +1,5 @@
+// Author: BiDuang<me@biduang.cn>
+// console.hpp is a lib for controlling the console terminal.
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
@@ -7,13 +9,19 @@
 #include <conio.h>
 #include "models/menu.hpp"
 
-class Console {
 
+/**
+ * @brief Class Console
+ *
+ * @details This class is used to manipulate the console.
+ * * It has methods to move the cursor, clear the screen, change the color of the text and background, and more.
+*/
+class Console {
 private:
 	HANDLE handle_;
 
 public:
-	enum Colors {
+	enum Colors {	//Terminal Colors Enum
 		Black = 0,
 		Blue = 1,
 		Green = 2,
@@ -32,7 +40,7 @@ public:
 		BrightWhite = 15
 	};
 
-	enum ArrowCommands {
+	enum ArrowCommands {	//Arrow Commands Enum
 		Up = 72,
 		Down = 80,
 		Left = 75,
@@ -42,31 +50,76 @@ public:
 		ESC = 27
 	};
 
+	~Console() = default; //Destructor with default implementation
+
+	/**
+	* @brief Construct a new Console object.
+	*
+	* @details When the object is created, it gets the handle of the console.
+	*
+	* @param `void`
+	*/
 	Console() {
 		handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
 	}
 
+	/**
+	* @brief Move the cursor to the position (0,0) of the console.
+	*
+	* @param `void`
+	*
+	* @return `void`
+	*/
 	void GotoXY() {
 		COORD c = { 0,0 };
 		SetConsoleCursorPosition(handle_, c);
 	}
 
-	void MoveX(short x) {
-		COORD c{ x,GetCursorY() };
-		SetConsoleCursorPosition(handle_, c);
-	}
-
+	/**
+	* @brief Move the cursor to the position (x,y) of the console.
+	*
+	* @param `short x` The x position of the cursor.
+	* @param `short y` The y position of the cursor.
+	*
+	* @return `void`
+	*/
 	void GotoXY(short x, short y) {
 		COORD c = { x,y };
 		SetConsoleCursorPosition(handle_, c);
 	}
 
+	/**
+	* @brief Move the cursor to the position x of the console in the same screen line.
+	*
+	* @param `short x` The x position of the cursor.
+	*
+	* @return `void`
+	*/
+	void MoveX(short x) {
+		COORD c{ x,GetCursorY() };
+		SetConsoleCursorPosition(handle_, c);
+	}
+
+	/**
+	* @brief Get the terminal's size.
+	*
+	* @param `void`
+	*
+	* @return `TerminalSize` A TerminalSize object, it contains the terminal's rows and cols info.
+	*/
 	TerminalSize GetTerminalSize() {
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(handle_, &csbi);
 		return TerminalSize{ csbi.srWindow.Right - csbi.srWindow.Left + 1, csbi.srWindow.Bottom - csbi.srWindow.Top + 1 };
 	}
 
+	/**
+	* @brief Clear the whole terminal screen.
+	*
+	* @param `void`
+	*
+	* @return `void`
+	*/
 	void Clear() {
 		COORD topLeft = { 0, 0 };
 		CONSOLE_SCREEN_BUFFER_INFO screen;
@@ -83,6 +136,18 @@ public:
 		SetConsoleCursorPosition(handle_, topLeft);
 	}
 
+	/**
+	* @brief Clear a specific part of the terminal screen, the clear area is a rectangle.
+	*
+	* @details The rectangle is defined by the top left corner position, the width and the height.
+	*
+	* @param `short x` The x position of the top left corner of the rectangle.
+	* @param `short y` The y position of the top left corner of the rectangle.
+	* @param `short dx` The width of the rectangle.
+	* @param `short dy` The height of the rectangle.
+	*
+	* @return `void`
+	*/
 	void Clear(short x, short y, short dx, short dy) {
 		COORD topLeft = { x, y };
 		CONSOLE_SCREEN_BUFFER_INFO screen;
@@ -99,14 +164,37 @@ public:
 		SetConsoleCursorPosition(handle_, topLeft);
 	}
 
-	void SetColor(const Colors f_color, const Colors bg_color = Black) const {
-		SetConsoleTextAttribute(handle_, f_color | bg_color << 4);
-	}
-
+	/**
+	* @brief Reset the terminal's color to the default (white font with black background).
+	*
+	* @param `void`
+	*
+	* @return `void`
+	*/
 	void SetColor() const {
 		SetConsoleTextAttribute(handle_, White);
 	}
 
+	/**
+	* @brief Set the terminal's color.
+	*
+	* @param `Colors f_color` The color of the font.
+	* @param `Colors bg_color` The color of the background, if not specified, black.
+	*
+	* @return `void`
+	*/
+	void SetColor(const Colors f_color, const Colors bg_color = Black) const {
+		SetConsoleTextAttribute(handle_, f_color | bg_color << 4);
+	}
+
+	/**
+	* @brief Draw a selection menu.
+	* @detail Recommanded to use with the printMenu function. This part is only for the menu rendering.
+	*
+	* @param `Menu m` A Menu object, it contains the menu's title, items and selection.
+	*
+	* @return `void`
+	*/
 	void MenuRender(Menu m) {
 		GotoXY(0, m.y);
 		for (int i = 0; i < 117; i++) std::cout << "=";
@@ -137,26 +225,65 @@ public:
 		for (int i = 0; i < 117; i++) std::cout << "=";
 	}
 
+	/**
+	* @brief Get the current cursor's y position.
+	*
+	* @param `void`
+	*
+	* @return `int` The y position of the cursor.
+	*/
 	int GetCursorY() {
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(handle_, &csbi);
 		return csbi.dwCursorPosition.Y;
 	}
 
+	/**
+	* @brief Make cursor go to the next line.
+	*
+	* @param `void`
+	*
+	* @return `void`
+	*/
 	void Endl() {
 		GotoXY(0, GetCursorY() + 1);
 	}
 
+	/**
+	* @brief Print a text with color infomation.
+	*
+	* @details The text color will be reset to the default (white font with black background) after printing.
+	*
+	* @param `const std::string& text` The text to be printed.
+	* @param `Colors color` The color of the text, if not specified, white.
+	* @param `Colors bg_color` The color of the background, if not specified, black.
+	*/
 	void Print(const std::string& text, Colors color = White, Colors bg_color = Black) {
 		SetColor(color, bg_color);
 		std::cout << text;
 		SetColor();
 	}
 
+	/**
+	* @brief Make the program pause by waiting for a key press.
+	*
+	* @param `void`
+	*
+	* @return `void`
+	*/
 	void Pause() {
 		auto _ = getchar();
 	}
 
+	/**
+	* @brief Get the arrow command from the keyboard input.
+	*
+	* @details The Backspace key is available only when the `hasReturn` is set to true.
+	*
+	* @param `bool hasReturn` If the menu has a cancel option, set this to true, otherwise, false.
+	*
+	* @return `ArrowCommands` A ArrowCommands enum, it represents the arrow command.
+	*/
 	ArrowCommands static GetArrowCommand(bool hasReturn = false) {
 		int ch = _getch();
 		while (ch != ESC) {

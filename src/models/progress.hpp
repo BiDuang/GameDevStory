@@ -4,13 +4,13 @@
 template <class T = int>
 class progress {
 public:
-	bool is_ok = false;
+	bool isOk = false;
 	bool is_extra_info = false;
 	T info = 0;
 
 	progress() = delete;
-	progress(bool is_ok, bool is_extra_info = false, T info = 0) :
-		is_ok(is_ok), is_extra_info(is_extra_info), info(info) {}
+	progress(bool isOk, bool is_extra_info = false, T info = 0) :
+		isOk(isOk), is_extra_info(is_extra_info), info(info) {}
 
 };
 

@@ -7,6 +7,7 @@
 #include "../models/menu.hpp"
 #include "../console.hpp"
 
+// make the function available to other files
 extern std::string& trim(std::string& s);
 extern bool printAsciiImage(const std::string& path, bool is_utf8 = false);
 extern int randint(int min, int max);

@@ -30,10 +30,14 @@ enum GameType
 	Music
 };
 
+/**
+* @brief The game product class.
+*
+* @details This class is used to store a game product data.
+*/
 class Product {
 private:
-	Product() = default;
-
+	Product() = default; //default constructor is only used for save loading
 	unsigned long long lastSales = 0;
 public:
 	std::string name = "";
@@ -52,9 +56,24 @@ public:
 	bool isFinished = false;
 	bool inSale = false;
 
+	/**
+	* @brief Construct a new Product object(Start a new project).
+	*
+	* @param `const std::string& name` The name of the product.
+	* @param `int createDay` The day when the product is created.
+	* @param `Platform platform` The platform of the product.
+	* @param `GameType gameType` The type of the product.
+	*/
 	Product(const std::string& name, int createDay, Platform platform, GameType gameType) :
 		name(name), createDay(createDay), platform(platform), gameType(gameType) {}
 
+	/**
+	* @brief Load the product data from a file(Used by save loading).
+	*
+	* @param `FILE* f` The file to load.
+	*
+	* @return `Product` The product data loaded from the file.
+	*/
 	static Product LoadImpl(FILE* f)
 	{
 		Product p;
@@ -78,6 +97,14 @@ public:
 
 		return p;
 	}
+
+	/**
+	* @brief Save the product data to a file(Used by save storing).
+	*
+	* @param `FILE* f` The file to save.
+	*
+	* @return `void`
+	*/
 	void SaveImpl(FILE* f)
 	{
 		WriteStringToFile(f, name);
@@ -100,10 +127,26 @@ public:
 		fwrite(&inSale, sizeof(inSale), 1, f);
 	}
 
+	/**
+	* @brief Get the sales performance of the product in the last week.
+	*
+	* @param `void`
+	*
+	* @return `unsigned long long` The sales performance of the product in the last week.
+	*/
 	unsigned long long GetSalesReport() const {
 		return sales - lastSales;
 	}
 
+	/**
+	* @brief Publish the product.
+	*
+	* @details The product must be finished and not in sale.
+	*
+	* @param `void`
+	*
+	* @return `bool` If the product is published successfully, return true, otherwise, false.
+	*/
 	bool PublishProduct() {
 		if (!isFinished || inSale) return false;
 		inSale = true;
@@ -129,6 +172,13 @@ public:
 		return true;
 	}
 
+	/**
+	* @brief Get the products that are in sale.
+	*
+	* @param `const std::vector<Product>& prods` The products to be filtered.
+	*
+	* @return `std::vector<Product>` The products that are in sale.
+	*/
 	static std::vector<Product> GetInSaleProds(const std::vector<Product>& prods) {
 		std::vector<Product> ret;
 		for (auto& p : prods) {
@@ -136,7 +186,7 @@ public:
 		}
 		return ret;
 	}
-};
+};// Class Product
 
 enum JobType {
 	Programmer,
@@ -146,7 +196,14 @@ enum JobType {
 	Almighty
 };
 
+/**
+* @brief The stuff class.
+*
+* @details This class is used to store a stuff data.
+* @details This class is trivially copyable.
+*/
 class Stuff {
+	Stuff() = default;
 public:
 	int id = 0;
 	int program = 0;
@@ -157,13 +214,23 @@ public:
 	int salary = 0;
 	JobType job = Programmer;
 
-	Stuff() = default;
-
+	// Create a stuff with specified attrs
 	Stuff(int id, int program, int art, int audio,
 		int design, int happiness, int salary, JobType job) :
 		id(id), program(program), art(art), audio(audio), design(design), happiness(happiness), salary(salary), job(job)
 	{}
 
+	/**
+	* @brief Construct a new Stuff object by random the attrs.
+	*
+	* @details The random range is determined by the day.
+	*
+	* @param `int day` The day when the stuff is hired.
+	*
+	* @param `JobType job` The job of the stuff.
+	*
+	* @param `int stuffId` The id of the stuff.
+	*/
 	Stuff(int day, JobType job, int stuffId) :job(job) {
 		id = stuffId;
 		program = randint(1, (10 * (day / 5 + 1)));
@@ -196,6 +263,13 @@ public:
 		happiness = 100;
 	}
 
+	/**
+	* @brief Stuff work for a round.
+	*
+	* @param `void`
+	*
+	* @return `bool` If the stuff is still working, return true, otherwise, false.
+	*/
 	bool roundWork() {
 		auto rand = randint(0, 5);
 		if (happiness >= rand)
@@ -206,12 +280,14 @@ public:
 	}
 };
 
+/**
+* @brief The financial report class.
+*/
 class FinancialReport {
 public:
 	int day = 0;
 	std::map<std::string, unsigned long long> prodSales;
 	std::map<int, int> stuffSalary;
-	int otherCost = 0;
 
 	FinancialReport() :prodSales({}), stuffSalary({}) {}
 	FinancialReport(int day, const std::vector<Product>& prod, const std::vector<Stuff>& empy) :day(day) {
@@ -233,6 +309,7 @@ public:
 		c.SetColor();
 		c.GotoXY(0, 3);
 		c.Print("[+] 游戏销售", Console::LightBlue);
+		c.Endl();
 		if (prodSales.empty())
 		{
 			c.GotoXY(0, 2 + c.GetCursorY());
@@ -257,18 +334,13 @@ public:
 				std::cout << "员工编号: " << s.first << "\t薪水: " << s.second << std::endl;
 			}
 		}
-		c.GotoXY(0, 2 + c.GetCursorY());
 
-		c.Print("[-] 其他开销", Console::LightMagenta);
-		c.GotoXY(0, 1 + c.GetCursorY());
-		std::cout << "工作室运营基本资金, 平台授权费等: " << otherCost;
 		c.GotoXY(0, 2 + c.GetCursorY());
-
 		c.Print("[=] 总计", Console::LightGreen);
 		c.GotoXY(0, 1 + c.GetCursorY());
 		std::cout << "总收入: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) << std::endl;
-		std::cout << "总支出: " << std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) + otherCost << std::endl;
-		std::cout << "总利润: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) - std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) - otherCost;
+		std::cout << "总支出: " << std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) << std::endl;
+		std::cout << "总利润: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) - std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; });
 		c.GotoXY(0, 2 + c.GetCursorY());
 		for (int i = 0; i < 117; i++) std::cout << "=";
 		c.GotoXY(0, 1 + c.GetCursorY());
@@ -276,10 +348,9 @@ public:
 		c.Pause();
 	}
 
-	static FinancialReport LoadImpl(FILE* f)
+	void LoadImpl(FILE* f)
 	{
-		FinancialReport p;
-		fread(&p.day, sizeof(p.day), 1, f);
+		fread(&day, sizeof(day), 1, f);
 
 		size_t prod_sales_count = 0;
 		fread(&prod_sales_count, sizeof(prod_sales_count), 1, f);
@@ -287,9 +358,9 @@ public:
 		for (size_t i = 0; i < prod_sales_count; ++i)
 		{
 			auto key = ReadStringFromFile(f);
-			decltype(p.prodSales)::value_type::second_type val;
+			decltype(prodSales)::value_type::second_type val;
 			fread(&val, sizeof(val), 1, f);
-			p.prodSales[key] = val;
+			prodSales[key] = val;
 		}
 
 		size_t stuff_salary_count = 0;
@@ -297,18 +368,14 @@ public:
 
 		for (size_t i = 0; i < stuff_salary_count; ++i)
 		{
-			decltype(p.stuffSalary)::key_type key;
-			decltype(p.stuffSalary)::key_type val;
+			decltype(stuffSalary)::key_type key;
+			decltype(stuffSalary)::key_type val;
 
 			fread(&key, sizeof(key), 1, f);
 			fread(&val, sizeof(val), 1, f);
 
-			p.stuffSalary[key] = val;
+			stuffSalary[key] = val;
 		}
-
-		fread(&p.otherCost, sizeof(otherCost), 1, f);
-
-		return p;
 	}
 	void SaveImpl(FILE* f)
 	{
@@ -331,8 +398,6 @@ public:
 			fwrite(&key, sizeof(key), 1, f);
 			fwrite(&val, sizeof(val), 1, f);
 		}
-
-		fwrite(&otherCost, sizeof(otherCost), 1, f);
 	}
 };
 
@@ -345,7 +410,7 @@ public:
 	std::string name;
 	std::vector<Stuff> stuffs;
 	std::vector<Product> finishedProducts;
-	FinancialReport financialReport;//TODO: Fix Load Error
+	FinancialReport financialReport;
 
 	Studio() :name(""), stuffs({}), finishedProducts({}), financialReport() {}
 
@@ -388,6 +453,7 @@ public:
 		{
 			finishedProducts.push_back(Product::LoadImpl(f));
 		}
+		financialReport.LoadImpl(f);
 	}
 	void SaveImpl(FILE* f)
 	{
@@ -407,6 +473,7 @@ public:
 		{
 			prod.SaveImpl(f);
 		}
+		financialReport.SaveImpl(f);
 	}
 };
 
@@ -426,6 +493,10 @@ public:
 
 	GameData(std::filesystem::path savePath) {
 		TryLoading(savePath);
+	}
+
+	GameData(std::filesystem::path savePath, bool& result) {
+		result = TryLoading(savePath);
 	}
 
 	GameData(const std::string& studioName)
@@ -612,6 +683,8 @@ public:
 			stage = 0;
 			day++;
 			Selling();
+
+			if (isAutoSave) TrySaving(std::filesystem::path("save/autosave.save"), true);
 			return true;
 		}
 		return false;
