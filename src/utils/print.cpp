@@ -58,6 +58,7 @@ bool printAsciiImage(const std::string& path, bool isUTF8) {
 */
 int printMenu(Menu m, Console& c) {
 	bool selected = false;
+	int selections = (int)m.items.size();
 	while (!selected) {
 		c.MenuRender(m);
 		auto command = c.GetArrowCommand(m.hasReturn);
@@ -70,19 +71,19 @@ int printMenu(Menu m, Console& c) {
 			break;
 		case Console::Enter:
 			selected = true;
-			c.Clear(0, m.y, 120, m.items.size() + 2 + (!m.title.empty()));
+			c.Clear(0, m.y, 120, selections + 2 + (!m.title.empty()));
 			return m.selection;
 		case Console::Backspace:
 			selected = true;
-			c.Clear(0, m.y, 120, m.items.size() + 2 + (!m.title.empty()));
-			return m.items.size() - 1;
+			c.Clear(0, m.y, 120, selections + 2 + (!m.title.empty()));
+			return selections - 1;
 		default:
 			break;
 		}
 		if (m.selection < 0) {
-			m.selection = m.items.size() - 1;
+			m.selection = selections - 1;
 		}
-		else if (m.selection >= m.items.size()) {
+		else if (m.selection >= selections) {
 			m.selection = 0;
 		}
 	}

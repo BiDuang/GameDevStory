@@ -232,7 +232,7 @@ public:
 	*
 	* @return `int` The y position of the cursor.
 	*/
-	int GetCursorY() {
+	short GetCursorY() {
 		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		GetConsoleScreenBufferInfo(handle_, &csbi);
 		return csbi.dwCursorPosition.Y;

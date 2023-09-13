@@ -71,7 +71,7 @@ public:
 
 	/**
 	 * @brief Load the product data from a file(Used by save loading).
-	 * 
+	 *
 	 * @author mr_cino
 	 *
 	 * @param `FILE* f` The file to load.
@@ -104,7 +104,7 @@ public:
 
 	/**
 	 * @brief Save the product data to a file(Used by save storing).
-	 * 
+	 *
 	 * @author mr_cino
 	 *
 	 * @param `FILE* f` The file to save.
@@ -402,7 +402,7 @@ public:
 
 	/**
 	 * @brief Load the report from saved file.
-	 * 
+	 *
 	 * @author mr_cino
 	 *
 	 * @param f The file to load.
@@ -441,7 +441,7 @@ public:
 
 	/**
 	 * @brief Save the report to file.
-	 * 
+	 *
 	 * @author mr_cino
 	 *
 	 * @param f The file to save.
@@ -515,7 +515,7 @@ public:
 	{
 		if (stuffs.size() >= 4)
 			return false;
-		newStuff.id = stuffs.size();
+		newStuff.id = (int)stuffs.size();
 		stuffs.push_back(newStuff);
 		return true;
 	}
@@ -805,7 +805,7 @@ public:
 				p.inSale = false;
 				continue;
 			}
-			p.sales = (unsigned long long)(randint(p.gamePoint / 10.0, (p.gamePoint * (1 - (releasedDays / 45.0))) * (day / (14.0))));
+			p.sales = (unsigned long long)(randint(p.gamePoint / 10, (p.gamePoint * (1 - (releasedDays / 45.0))) * (day / (14.0))));
 			money += p.sales * 3 * ((long long)p.platform + 1);
 		}
 	}
