@@ -5,8 +5,8 @@
 *
 * @details If the maximum value is less than the minimum value, the minimum value will be returned(no random).
 *
-* @param `int min` The minimum value of the random integer.
-* @param `int max` The maximum value of the random integer.
+* @param min The minimum value of the random integer.
+* @param max The maximum value of the random integer.
 *
 * @return `int` The random integer.
 */

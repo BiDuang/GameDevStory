@@ -1,17 +1,23 @@
 #ifndef PROGRESS_HPP
 #define PROGRESS_HPP
 
+/**
+* @brief Class Progress
+*
+* @details This class contains the a In-game progress info.
+* @details If a sence has a value need to be returned, dump it into the property `info`.
+*/
 template <class T = int>
 class progress {
 public:
 	bool isOk = false;
-	bool is_extra_info = false;
+	bool hasExtraInfo = false;
 	T info = 0;
 
+	// Default constructor is not allowed.
 	progress() = delete;
-	progress(bool isOk, bool is_extra_info = false, T info = 0) :
-		isOk(isOk), is_extra_info(is_extra_info), info(info) {}
-
+	progress(bool isOk, bool hasExtraInfo = false, T info = 0) :
+		isOk(isOk), hasExtraInfo(hasExtraInfo), info(info) {}
 };
 
-#endif
+#endif //PROGRESS_HPP

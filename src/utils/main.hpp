@@ -14,5 +14,4 @@ extern int randint(int min, int max);
 extern int printMenu(Menu m, Console& c);
 extern void WriteStringToFile(FILE* f, const std::string& str);
 extern std::string ReadStringFromFile(FILE* f);
-
 #endif

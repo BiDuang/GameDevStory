@@ -13,7 +13,8 @@
 #include <filesystem>
 #include <optional>
 
-enum Platform {
+enum Platform
+{
 	PC,
 	Mobile,
 	XCase,
@@ -31,14 +32,16 @@ enum GameType
 };
 
 /**
-* @brief The game product class.
-*
-* @details This class is used to store a game product data.
-*/
-class Product {
+ * @brief The game product class.
+ *
+ * @details This class is used to store a game product data.
+ */
+class Product
+{
 private:
-	Product() = default; //default constructor is only used for save loading
+	Product() = default; // default constructor is only used for save loading
 	unsigned long long lastSales = 0;
+
 public:
 	std::string name = "";
 	int createDay = 0;
@@ -57,23 +60,24 @@ public:
 	bool inSale = false;
 
 	/**
-	* @brief Construct a new Product object(Start a new project).
-	*
-	* @param `const std::string& name` The name of the product.
-	* @param `int createDay` The day when the product is created.
-	* @param `Platform platform` The platform of the product.
-	* @param `GameType gameType` The type of the product.
-	*/
-	Product(const std::string& name, int createDay, Platform platform, GameType gameType) :
-		name(name), createDay(createDay), platform(platform), gameType(gameType) {}
+	 * @brief Construct a new Product object(Start a new project).
+	 *
+	 * @param `const std::string& name` The name of the product.
+	 * @param `int createDay` The day when the product is created.
+	 * @param `Platform platform` The platform of the product.
+	 * @param `GameType gameType` The type of the product.
+	 */
+	Product(const std::string& name, int createDay, Platform platform, GameType gameType) : name(name), createDay(createDay), platform(platform), gameType(gameType) {}
 
 	/**
-	* @brief Load the product data from a file(Used by save loading).
-	*
-	* @param `FILE* f` The file to load.
-	*
-	* @return `Product` The product data loaded from the file.
-	*/
+	 * @brief Load the product data from a file(Used by save loading).
+	 * 
+	 * @author mr_cino
+	 *
+	 * @param `FILE* f` The file to load.
+	 *
+	 * @return `Product` The product data loaded from the file.
+	 */
 	static Product LoadImpl(FILE* f)
 	{
 		Product p;
@@ -99,12 +103,14 @@ public:
 	}
 
 	/**
-	* @brief Save the product data to a file(Used by save storing).
-	*
-	* @param `FILE* f` The file to save.
-	*
-	* @return `void`
-	*/
+	 * @brief Save the product data to a file(Used by save storing).
+	 * 
+	 * @author mr_cino
+	 *
+	 * @param `FILE* f` The file to save.
+	 *
+	 * @return `void`
+	 */
 	void SaveImpl(FILE* f)
 	{
 		WriteStringToFile(f, name);
@@ -128,27 +134,30 @@ public:
 	}
 
 	/**
-	* @brief Get the sales performance of the product in the last week.
-	*
-	* @param `void`
-	*
-	* @return `unsigned long long` The sales performance of the product in the last week.
-	*/
-	unsigned long long GetSalesReport() const {
+	 * @brief Get the sales performance of the product in the last week.
+	 *
+	 * @param `void`
+	 *
+	 * @return `unsigned long long` The sales performance of the product in the last week.
+	 */
+	unsigned long long GetSalesReport() const
+	{
 		return sales - lastSales;
 	}
 
 	/**
-	* @brief Publish the product.
-	*
-	* @details The product must be finished and not in sale.
-	*
-	* @param `void`
-	*
-	* @return `bool` If the product is published successfully, return true, otherwise, false.
-	*/
-	bool PublishProduct() {
-		if (!isFinished || inSale) return false;
+	 * @brief Publish the product.
+	 *
+	 * @details The product must be finished and not in sale.
+	 *
+	 * @param void
+	 *
+	 * @return `bool` If the product is published successfully, return true, otherwise, false.
+	 */
+	bool PublishProduct()
+	{
+		if (!isFinished || inSale)
+			return false;
 		inSale = true;
 
 		switch (gameType)
@@ -173,22 +182,26 @@ public:
 	}
 
 	/**
-	* @brief Get the products that are in sale.
-	*
-	* @param `const std::vector<Product>& prods` The products to be filtered.
-	*
-	* @return `std::vector<Product>` The products that are in sale.
-	*/
-	static std::vector<Product> GetInSaleProds(const std::vector<Product>& prods) {
+	 * @brief Get the products that are in sale.
+	 *
+	 * @param prods The products to be filtered.
+	 *
+	 * @return `std::vector<Product>` The products that are in sale.
+	 */
+	static std::vector<Product> GetInSaleProds(const std::vector<Product>& prods)
+	{
 		std::vector<Product> ret;
-		for (auto& p : prods) {
-			if (p.inSale)	ret.push_back(p);
+		for (auto& p : prods)
+		{
+			if (p.inSale)
+				ret.push_back(p);
 		}
 		return ret;
 	}
-};// Class Product
+}; // Class Product
 
-enum JobType {
+enum JobType
+{
 	Programmer,
 	Artist,
 	Musician,
@@ -197,13 +210,13 @@ enum JobType {
 };
 
 /**
-* @brief The stuff class.
-*
-* @details This class is used to store a stuff data.
-* @details This class is trivially copyable.
-*/
-class Stuff {
-	Stuff() = default;
+ * @brief The stuff class.
+ *
+ * @details This class is used to store a stuff data.
+ * @details This class is trivially copyable.
+ */
+class Stuff
+{
 public:
 	int id = 0;
 	int program = 0;
@@ -214,24 +227,28 @@ public:
 	int salary = 0;
 	JobType job = Programmer;
 
+	// Default constructor
+	Stuff() = default;
+
 	// Create a stuff with specified attrs
 	Stuff(int id, int program, int art, int audio,
-		int design, int happiness, int salary, JobType job) :
-		id(id), program(program), art(art), audio(audio), design(design), happiness(happiness), salary(salary), job(job)
-	{}
+		int design, int happiness, int salary, JobType job) : id(id), program(program), art(art), audio(audio), design(design), happiness(happiness), salary(salary), job(job)
+	{
+	}
 
 	/**
-	* @brief Construct a new Stuff object by random the attrs.
-	*
-	* @details The random range is determined by the day.
-	*
-	* @param `int day` The day when the stuff is hired.
-	*
-	* @param `JobType job` The job of the stuff.
-	*
-	* @param `int stuffId` The id of the stuff.
-	*/
-	Stuff(int day, JobType job, int stuffId) :job(job) {
+	 * @brief Construct a new Stuff object by random the attrs.
+	 *
+	 * @details The random range is determined by the day.
+	 *
+	 * @param day The day when the stuff is hired.
+	 *
+	 * @param job The job of the stuff.
+	 *
+	 * @param stuffId The id of the stuff.
+	 */
+	Stuff(int day, JobType job, int stuffId) : job(job)
+	{
 		id = stuffId;
 		program = randint(1, (10 * (day / 5 + 1)));
 		art = randint(1, (10 * (day / 5 + 1)));
@@ -264,13 +281,14 @@ public:
 	}
 
 	/**
-	* @brief Stuff work for a round.
-	*
-	* @param `void`
-	*
-	* @return `bool` If the stuff is still working, return true, otherwise, false.
-	*/
-	bool roundWork() {
+	 * @brief Stuff work for a round.
+	 *
+	 * @param void
+	 *
+	 * @return `bool` If the stuff is still working, return true, otherwise, false.
+	 */
+	bool roundWork()
+	{
 		auto rand = randint(0, 5);
 		if (happiness >= rand)
 			happiness -= rand;
@@ -281,28 +299,50 @@ public:
 };
 
 /**
-* @brief The financial report class.
-*/
-class FinancialReport {
+ * @brief The financial report class.
+ */
+class FinancialReport
+{
 public:
 	int day = 0;
 	std::map<std::string, unsigned long long> prodSales;
 	std::map<int, int> stuffSalary;
 
-	FinancialReport() :prodSales({}), stuffSalary({}) {}
-	FinancialReport(int day, const std::vector<Product>& prod, const std::vector<Stuff>& empy) :day(day) {
-		for (auto& p : prod) {
+	// Default constructor
+	FinancialReport() : prodSales({}), stuffSalary({}) {}
+
+	/**
+	 * @brief Construct a new Financial Report object.
+	 *
+	 * @param day The day when the report is generated.
+	 * @param prod The products in sell.
+	 * @param empy The stuffs in the company.
+	 */
+	FinancialReport(int day, const std::vector<Product>& prod, const std::vector<Stuff>& empy) : day(day)
+	{
+		for (auto& p : prod)
+		{
 			prodSales[p.name] = p.GetSalesReport();
 		}
-		for (auto& e : empy) {
+		for (auto& e : empy)
+		{
 			stuffSalary[e.id] = e.salary;
 		}
 	}
 
-	void PrintReport(Console& c) {
+	/**
+	 * @brief Print the report to the console.
+	 *
+	 * @param c The console to print the report.
+	 *
+	 * @return `void`
+	 */
+	void PrintReport(Console& c)
+	{
 		c.Clear();
 		c.GotoXY();
-		for (int i = 0; i < 117; i++) std::cout << "=";
+		for (int i = 0; i < 117; i++)
+			std::cout << "=";
 		c.GotoXY(0, 1);
 		c.SetColor(Console::LightYellow);
 		std::cout << day / 7 << " 周财务报告";
@@ -317,7 +357,8 @@ public:
 		}
 		else
 		{
-			for (auto& p : prodSales) {
+			for (auto& p : prodSales)
+			{
 				std::cout << p.first << "\t销量: " << p.second << std::endl;
 			}
 		}
@@ -325,12 +366,15 @@ public:
 
 		c.Print("[-] 员工工资", Console::LightMagenta);
 		c.GotoXY(0, 1 + c.GetCursorY());
-		if (stuffSalary.empty()) {
+		if (stuffSalary.empty())
+		{
 			c.GotoXY(0, 1 + c.GetCursorY());
 			c.Print("这周工作室没有发放任何薪水", Console::Gray);
 		}
-		else {
-			for (auto& s : stuffSalary) {
+		else
+		{
+			for (auto& s : stuffSalary)
+			{
 				std::cout << "员工编号: " << s.first << "\t薪水: " << s.second << std::endl;
 			}
 		}
@@ -338,16 +382,33 @@ public:
 		c.GotoXY(0, 2 + c.GetCursorY());
 		c.Print("[=] 总计", Console::LightGreen);
 		c.GotoXY(0, 1 + c.GetCursorY());
-		std::cout << "总收入: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) << std::endl;
-		std::cout << "总支出: " << std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; }) << std::endl;
-		std::cout << "总利润: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b) {return a + b.second; }) - std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b) {return a + b.second; });
+		std::cout << "总收入: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b)
+			{ return a + b.second; })
+			<< std::endl;
+		std::cout << "总支出: " << std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b)
+			{ return a + b.second; })
+			<< std::endl;
+		std::cout << "总利润: " << std::accumulate(prodSales.begin(), prodSales.end(), 0, [](int a, std::pair<std::string, int> b)
+			{ return a + b.second; }) -
+			std::accumulate(stuffSalary.begin(), stuffSalary.end(), 0, [](int a, std::pair<int, int> b)
+				{ return a + b.second; });
 		c.GotoXY(0, 2 + c.GetCursorY());
-		for (int i = 0; i < 117; i++) std::cout << "=";
+		for (int i = 0; i < 117; i++)
+			std::cout << "=";
 		c.GotoXY(0, 1 + c.GetCursorY());
 		c.Print("按任意键离开报告页面...", Console::Gray);
 		c.Pause();
 	}
 
+	/**
+	 * @brief Load the report from saved file.
+	 * 
+	 * @author mr_cino
+	 *
+	 * @param f The file to load.
+	 *
+	 * @return `void`
+	 */
 	void LoadImpl(FILE* f)
 	{
 		fread(&day, sizeof(day), 1, f);
@@ -377,6 +438,16 @@ public:
 			stuffSalary[key] = val;
 		}
 	}
+
+	/**
+	 * @brief Save the report to file.
+	 * 
+	 * @author mr_cino
+	 *
+	 * @param f The file to save.
+	 *
+	 * @return `void`
+	 */
 	void SaveImpl(FILE* f)
 	{
 		fwrite(&day, sizeof(day), 1, f);
@@ -401,10 +472,17 @@ public:
 	}
 };
 
-class Studio {
+/**
+ * @brief The studio class.
+ *
+ * @details This class contains the studio's info.
+ */
+class Studio
+{
 
+	// Studio's copy construction is not allowed.
 	Studio(const Studio&) = delete;
-	Studio& operator = (const Studio&) = delete;
+	Studio& operator=(const Studio&) = delete;
 
 public:
 	std::string name;
@@ -412,27 +490,60 @@ public:
 	std::vector<Product> finishedProducts;
 	FinancialReport financialReport;
 
-	Studio() :name(""), stuffs({}), finishedProducts({}), financialReport() {}
+	// Default constructor.
+	Studio() : name(""), stuffs({}), finishedProducts({}), financialReport() {}
 
-	Studio(const std::string& name) : name(name), financialReport() {
-		stuffs = { Stuff(0,Programmer,0), Stuff(0,Artist,1), Stuff(0,Musician,2), Stuff(0,Designer,3) };
+	/**
+	 * @brief Constructor with name.
+	 *
+	 * @param name The name of the studio.
+	 */
+	Studio(const std::string& name) : name(name), financialReport()
+	{
+		stuffs = { Stuff(0, Programmer, 0), Stuff(0, Artist, 1), Stuff(0, Musician, 2), Stuff(0, Designer, 3) };
 		finishedProducts = std::vector<Product>();
 	}
 
-	bool HireStuff(Stuff newStuff) {
-		if (stuffs.size() >= 4) return false;
+	/**
+	 * @brief Hire a new stuff.
+	 *
+	 * @param newStuff The new stuff to hire.
+	 *
+	 * @return `true` if the stuff is hired successfully, otherwise, `false`.
+	 */
+	bool HireStuff(Stuff newStuff)
+	{
+		if (stuffs.size() >= 4)
+			return false;
 		newStuff.id = stuffs.size();
 		stuffs.push_back(newStuff);
 		return true;
 	}
 
-	bool FireStuff(int id) {
-		if (stuffs.empty() || id > stuffs.size()) return false;
+	/**
+	 * @brief Fire a stuff.
+	 *
+	 * @param id The id of the stuff to fire.
+	 *
+	 * @return `true` if the stuff is fired successfully, otherwise, `false`.
+	 */
+	bool FireStuff(int id)
+	{
+		if (stuffs.empty() || id < 0 || id > stuffs.size())
+			return false;
 		stuffs.erase(stuffs.begin() + id);
-		for (int i = id; i < stuffs.size(); i++) stuffs[i].id--;
+		for (int i = id; i < stuffs.size(); i++)
+			stuffs[i].id--;
 		return true;
 	}
 
+	/**
+	 * @brief Load the studio info from saved file.
+	 *
+	 * @param f The file to load.
+	 *
+	 * @return `void`
+	 */
 	void LoadImpl(FILE* f)
 	{
 		name = ReadStringFromFile(f);
@@ -455,6 +566,14 @@ public:
 		}
 		financialReport.LoadImpl(f);
 	}
+
+	/**
+	 * @brief Save the studio info into file.
+	 *
+	 * @param f The file to save.
+	 *
+	 * @return `void`
+	 */
 	void SaveImpl(FILE* f)
 	{
 		WriteStringToFile(f, name);
@@ -477,9 +596,17 @@ public:
 	}
 };
 
-class GameData {
+/**
+ * @brief The game data class.
+ *
+ * @details This class contains all the game data.
+ * @details In-game system can access the game data through this class.
+ */
+class GameData
+{
 private:
 	int devProgress = 0;
+
 public:
 	int day = 1;
 	short stage = 0;
@@ -491,18 +618,36 @@ public:
 	std::optional<Product> workingProduct = std::nullopt;
 	Studio studio;
 
-	GameData(std::filesystem::path savePath) {
-		TryLoading(savePath);
+	/**
+	 * @brief Load the game data from saved file.
+	 *
+	 * @param filePath The path of the save file.
+	 */
+	GameData(std::filesystem::path filePath)
+	{
+		TryLoading(filePath);
 	}
 
-	GameData(std::filesystem::path savePath, bool& result) {
-		result = TryLoading(savePath);
+	/**
+	 * @brief Load the game data from saved file, and return the result by ref.
+	 *
+	 * @param filePath The path of the save file.
+	 * @param result The result of save loading.
+	 */
+	GameData(std::filesystem::path filePath, bool& result)
+	{
+		result = TryLoading(filePath);
 	}
 
+	/**
+	 * @brief Make a new game data.
+	 *
+	 * @param studioName The name of the studio.
+	 */
 	GameData(const std::string& studioName)
 		: studio(studioName)
 	{
-		money = 50000;
+		money = 20000;
 	}
 
 	enum class SavingResult
@@ -512,14 +657,23 @@ public:
 		FAILED,
 	};
 
-	bool TryLoading(const std::filesystem::path& saving_file_path)
+	/**
+	 * @brief Save the game data into file.
+	 *
+	 * @author mr_cino
+	 *
+	 * @param saveFilePath The path of the save file.
+	 *
+	 * @return `bool` The result of saving.
+	 */
+	bool TryLoading(const std::filesystem::path& saveFilePath)
 	{
 		std::error_code ec = {};
 		// NOTE: 使用error_code，不然如果文件系统库操作失败会丢异常，规避异常机制的使用
-		if (!std::filesystem::exists(saving_file_path, ec))
+		if (!std::filesystem::exists(saveFilePath, ec))
 			return false;
 
-		FILE* saving = fopen(saving_file_path.string().c_str(), "rb");
+		FILE* saving = fopen(saveFilePath.string().c_str(), "rb");
 		if (saving == nullptr)
 			// 无法打开文件以保存，返回错误
 			return false;
@@ -547,14 +701,24 @@ public:
 		return true;
 	}
 
-	SavingResult TrySaving(const std::filesystem::path& saving_file_path, bool force)
+	/**
+	 * @brief Save the game data into file.
+	 *
+	 * @author mr_cino
+	 *
+	 * @param saveFilePath The path of the save file.
+	 * @param force If file conflict occurs, whether to force save.
+	 *
+	 * @return `SavingResult` The result of saving.
+	 */
+	SavingResult TrySaving(const std::filesystem::path& saveFilePath, bool force)
 	{
 		std::error_code ec = {};
 		// NOTE: 使用error_code，不然如果文件系统库操作失败会丢异常，规避异常机制的使用
-		if (force == false && std::filesystem::exists(saving_file_path, ec))
+		if (force == false && std::filesystem::exists(saveFilePath, ec))
 			return SavingResult::FILE_EXIST;
 
-		FILE* saving = fopen(saving_file_path.string().c_str(), "wb");
+		FILE* saving = fopen(saveFilePath.string().c_str(), "wb");
 		if (saving == nullptr)
 			// 无法打开文件以保存，返回错误
 			return SavingResult::FAILED;
@@ -582,61 +746,119 @@ public:
 		return SavingResult::OK;
 	}
 
-	bool TakeADayOff() {
-		if (stage == 0) {
-			for (auto& stuff : studio.stuffs) {
-				if (stuff.happiness <= 65) stuff.happiness += 35;
-				else stuff.happiness = 100;
+	/**
+	 * @brief Studio take a break.
+	 *
+	 * @param void
+	 *
+	 * @return `bool` Whether the studio take a break successfully.
+	 */
+	bool TakeADayOff()
+	{
+		if (stage == 0)
+		{
+			for (auto& stuff : studio.stuffs)
+			{
+				if (stuff.happiness <= 65)
+					stuff.happiness += 35;
+				else
+					stuff.happiness = 100;
 			}
 			day++;
 			return true;
 		}
-		else return false;
+		else
+			return false;
 	}
 
-	void PublishProduct() {
-		if (workingProduct.has_value() && !workingProduct.value().isFinished) return;
+	/**
+	 * @brief Publish a finished product.
+	 *
+	 * @param void
+	 *
+	 * @return `void`
+	 */
+	void PublishProduct()
+	{
+		if (workingProduct.has_value() && !workingProduct.value().isFinished)
+			return;
 		workingProduct.value().PublishProduct();
 		studio.finishedProducts.push_back(workingProduct.value());
 		workingProduct = std::nullopt;
 		devProgress = 0;
 	}
 
-
-	void Selling() {
-		for (auto& p : studio.finishedProducts) {
+	/**
+	 * @brief Selling the products.
+	 *
+	 * @param void
+	 *
+	 * @return `void`
+	 */
+	void Selling()
+	{
+		for (auto& p : studio.finishedProducts)
+		{
 			auto releasedDays = day - p.publishDay;
-			if (releasedDays >= 45) { p.inSale = false; continue; }
+			if (releasedDays >= 45)
+			{
+				p.inSale = false;
+				continue;
+			}
 			p.sales = (unsigned long long)(randint(p.gamePoint / 10.0, (p.gamePoint * (1 - (releasedDays / 45.0))) * (day / (14.0))));
 			money += p.sales * 3 * ((long long)p.platform + 1);
-
 		}
 	}
 
-	void WeekSet(Console& c) {
-		money -= std::accumulate(studio.stuffs.begin(), studio.stuffs.end(), 0, [](int a, Stuff b) {return a + b.salary; });
+	/**
+	 * @brief Week process.
+	 *
+	 * @param void
+	 *
+	 * @return `void`
+	 */
+	void WeekSet()
+	{
+		money -= std::accumulate(studio.stuffs.begin(), studio.stuffs.end(), 0, [](int a, Stuff b)
+			{ return a + b.salary; });
 		studio.financialReport = FinancialReport(day, Product::GetInSaleProds(studio.finishedProducts), studio.stuffs);
 	}
 
-	bool RoundDev(Console& c) {
+	/**
+	 * @brief Round process.
+	 *
+	 * @param c The console.
+	 *
+	 * @return `bool` If the day is over, `true`, otherwise, `false`.
+	 */
+	bool RoundDev(Console& c)
+	{
 		stage++;
-		if (workingProduct.has_value()) {
-			if (devProgress >= 100) {
-				if (!workingProduct.value().isFinished) {
+		if (workingProduct.has_value())
+		{
+			if (devProgress >= 100)
+			{
+				if (!workingProduct.value().isFinished)
+				{
 					std::string s1 = workingProduct.value().name;
 					printMenu(Menu({ "好的" }, 15, 0, "你的项目 \"" + s1 + "\" 已经制作完成了，你可以选择现在发布或者继续调试增加稳定性。"), c);
 					workingProduct.value().isFinished = true;
 				}
-				for (auto& stuff : studio.stuffs) {
-					if (!stuff.roundWork() || stuff.job != Programmer) continue;
+				for (auto& stuff : studio.stuffs)
+				{
+					if (!stuff.roundWork() || stuff.job != Programmer)
+						continue;
 					workingProduct.value().stability += randint(0, stuff.program / 2);
 				}
 			}
-			else {
+			else
+			{
 				bool isWork = false;
 
-				for (auto& stuff : studio.stuffs) {
-					if (!stuff.roundWork()) continue;
+				for (auto& stuff : studio.stuffs)
+				{
+					if (!stuff.roundWork())
+						continue;
 					isWork = true;
 					switch (stuff.job)
 					{
@@ -675,22 +897,31 @@ public:
 				{
 					int basicProgress = randint(0, 2);
 					devProgress += basicProgress * (isFastDev ? 2 : 1);
-					if (devProgress >= 100) devProgress = 100;
+					if (devProgress >= 100)
+						devProgress = 100;
 				}
 			}
 		}
-		if (stage > 3) {
+		if (stage > 3)
+		{
 			stage = 0;
 			day++;
 			Selling();
-
-			if (isAutoSave) TrySaving(std::filesystem::path("save/autosave.save"), true);
+			if (money < 0)
+			{
+				printMenu(Menu({ "结束游戏" }, 15, 0, "你的工作室破产了。"), c);
+				exit(0);
+			}
+			if (isAutoSave)
+				TrySaving(std::filesystem::path("save/autosave.save"), true);
 			return true;
 		}
 		return false;
 	}
 
-	int GetDevProgress() {
+	// Develop progress getter
+	int GetDevProgress()
+	{
 		return devProgress;
 	}
 };

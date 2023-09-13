@@ -1,7 +1,9 @@
 #include "main.hpp"
 
+// Game Instance
 std::unique_ptr<GameData> instance;
 
+// Main Game Loop
 void gameCycle() {
 	Console c;
 	while (true) {
@@ -10,12 +12,13 @@ void gameCycle() {
 			instance->RoundDev(c);
 			if (instance->day % 7 == 0 && instance->stage == 0)
 			{
-				instance->WeekSet(c);
+				instance->WeekSet();
 			}
 		}
 	}
 }
 
+// Create a new save
 progress<int> beginning() {
 	Console c;
 	c.Clear();
@@ -54,6 +57,7 @@ progress<int> beginning() {
 	}
 }
 
+// Load an existing save 
 progress<int> loadsave() {
 	Console c;
 	c.Clear();
@@ -98,6 +102,7 @@ progress<int> loadsave() {
 	return progress<int>(true);
 }
 
+// Create a new game project
 progress<int> createGame(Console& c) {
 	c.Clear();
 	c.GotoXY();
@@ -195,6 +200,7 @@ progress<int> createGame(Console& c) {
 	return progress<int>(true);
 }
 
+// Set the game development speed
 progress<int> setDevPlan(Console& c) {
 	std::string s1 = "调整开发速度", name;
 	s1 += instance->isFastDev ? "为\"普通开发\"" : "为\"加急开发\"";
@@ -240,6 +246,7 @@ progress<int> setDevPlan(Console& c) {
 	return progress<int>(true);
 }
 
+// JobFair Sence
 progress<int> jobFair(Console& c) {
 	instance->isFairChecked = true;
 	c.Clear();
@@ -310,6 +317,7 @@ progress<int> jobFair(Console& c) {
 	return progress<int>(true);
 }
 
+// Save the game
 progress<bool> save(Console& c) {
 	c.Clear();
 	c.GotoXY();
@@ -330,6 +338,7 @@ progress<bool> save(Console& c) {
 	return progress<bool>(result == GameData::SavingResult::OK);
 }
 
+// Main game sence(Info Panel)
 progress<int> studio(Console& c) {
 	c.Clear();
 #pragma region Sidebars

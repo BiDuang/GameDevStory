@@ -14,7 +14,7 @@
  * @brief Class Console
  *
  * @details This class is used to manipulate the console.
- * * It has methods to move the cursor, clear the screen, change the color of the text and background, and more.
+ * @details It has methods to move the cursor, clear the screen, change the color of the text and background, and more.
 */
 class Console {
 private:
@@ -66,7 +66,7 @@ public:
 	/**
 	* @brief Move the cursor to the position (0,0) of the console.
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `void`
 	*/
@@ -78,8 +78,8 @@ public:
 	/**
 	* @brief Move the cursor to the position (x,y) of the console.
 	*
-	* @param `short x` The x position of the cursor.
-	* @param `short y` The y position of the cursor.
+	* @param x The x position of the cursor.
+	* @param short The y position of the cursor.
 	*
 	* @return `void`
 	*/
@@ -91,7 +91,7 @@ public:
 	/**
 	* @brief Move the cursor to the position x of the console in the same screen line.
 	*
-	* @param `short x` The x position of the cursor.
+	* @param x The x position of the cursor.
 	*
 	* @return `void`
 	*/
@@ -103,7 +103,7 @@ public:
 	/**
 	* @brief Get the terminal's size.
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `TerminalSize` A TerminalSize object, it contains the terminal's rows and cols info.
 	*/
@@ -116,7 +116,7 @@ public:
 	/**
 	* @brief Clear the whole terminal screen.
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `void`
 	*/
@@ -141,10 +141,10 @@ public:
 	*
 	* @details The rectangle is defined by the top left corner position, the width and the height.
 	*
-	* @param `short x` The x position of the top left corner of the rectangle.
-	* @param `short y` The y position of the top left corner of the rectangle.
-	* @param `short dx` The width of the rectangle.
-	* @param `short dy` The height of the rectangle.
+	* @param x The x position of the top left corner of the rectangle.
+	* @param y The y position of the top left corner of the rectangle.
+	* @param dx The width of the rectangle.
+	* @param dy The height of the rectangle.
 	*
 	* @return `void`
 	*/
@@ -167,7 +167,7 @@ public:
 	/**
 	* @brief Reset the terminal's color to the default (white font with black background).
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `void`
 	*/
@@ -178,20 +178,20 @@ public:
 	/**
 	* @brief Set the terminal's color.
 	*
-	* @param `Colors f_color` The color of the font.
-	* @param `Colors bg_color` The color of the background, if not specified, black.
+	* @param fontColor The color of the font.
+	* @param bgColor The color of the background, if not specified, black.
 	*
 	* @return `void`
 	*/
-	void SetColor(const Colors f_color, const Colors bg_color = Black) const {
-		SetConsoleTextAttribute(handle_, f_color | bg_color << 4);
+	void SetColor(const Colors fontColor, const Colors bgColor = Black) const {
+		SetConsoleTextAttribute(handle_, fontColor | bgColor << 4);
 	}
 
 	/**
 	* @brief Draw a selection menu.
 	* @detail Recommanded to use with the printMenu function. This part is only for the menu rendering.
 	*
-	* @param `Menu m` A Menu object, it contains the menu's title, items and selection.
+	* @param m A Menu object, it contains the menu's title, items and selection.
 	*
 	* @return `void`
 	*/
@@ -206,10 +206,10 @@ public:
 			GotoXY(4, m.y + 1);
 		}
 
-		int total_rended = 0;
+		int totalRendered = 0;
 		for (auto& i : m.items)
 		{
-			if (total_rended == m.selection) {
+			if (totalRendered == m.selection) {
 				SetColor(Yellow, Gray);
 				std::cout << " > " << i << " ";
 				SetColor();
@@ -218,17 +218,17 @@ public:
 				std::cout << " - " << i << " ";
 			}
 
-			GotoXY(4, m.y + 1 + (++total_rended));
+			GotoXY(4, m.y + 1 + (++totalRendered));
 
 		}
-		GotoXY(0, m.y + 1 + total_rended);
+		GotoXY(0, m.y + 1 + totalRendered);
 		for (int i = 0; i < 117; i++) std::cout << "=";
 	}
 
 	/**
 	* @brief Get the current cursor's y position.
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `int` The y position of the cursor.
 	*/
@@ -241,7 +241,7 @@ public:
 	/**
 	* @brief Make cursor go to the next line.
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `void`
 	*/
@@ -254,12 +254,12 @@ public:
 	*
 	* @details The text color will be reset to the default (white font with black background) after printing.
 	*
-	* @param `const std::string& text` The text to be printed.
-	* @param `Colors color` The color of the text, if not specified, white.
-	* @param `Colors bg_color` The color of the background, if not specified, black.
+	* @param text The text to be printed.
+	* @param color The color of the text, if not specified, white.
+	* @param bgColor The color of the background, if not specified, black.
 	*/
-	void Print(const std::string& text, Colors color = White, Colors bg_color = Black) {
-		SetColor(color, bg_color);
+	void Print(const std::string& text, Colors color = White, Colors bgColor = Black) {
+		SetColor(color, bgColor);
 		std::cout << text;
 		SetColor();
 	}
@@ -267,7 +267,7 @@ public:
 	/**
 	* @brief Make the program pause by waiting for a key press.
 	*
-	* @param `void`
+	* @param void
 	*
 	* @return `void`
 	*/
@@ -280,7 +280,7 @@ public:
 	*
 	* @details The Backspace key is available only when the `hasReturn` is set to true.
 	*
-	* @param `bool hasReturn` If the menu has a cancel option, set this to true, otherwise, false.
+	* @param hasReturn If the menu has a cancel option, set this to true, otherwise, false.
 	*
 	* @return `ArrowCommands` A ArrowCommands enum, it represents the arrow command.
 	*/
