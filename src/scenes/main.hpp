@@ -15,11 +15,11 @@
 extern void openning();
 extern void mainMenu(const std::string& version);
 
-extern progress<int> beginning();
-extern progress<int> loadsave();
+extern Progress<int> beginning();
+extern Progress<int> loadsave();
 
 extern void gameCycle();
-extern progress<int> studio(Console& c);
+extern Progress<int> studio(Console& c);
 
 
 #endif

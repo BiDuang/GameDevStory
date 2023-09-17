@@ -19,7 +19,7 @@ void gameCycle() {
 }
 
 // Create a new save
-progress<int> beginning() {
+Progress<int> beginning() {
 	Console c;
 	c.Clear();
 	while (true) {
@@ -52,13 +52,13 @@ progress<int> beginning() {
 		std::cout << "好的，你的工作室名称为: " << instance->studio.name << std::endl;
 		std::cout << "是这样吗？" << std::endl << std::endl;
 		auto result = printMenu(Menu({ "是，就这个了","否，我再想想" }, 5, 0), c);
-		if (result == 0) return progress<int>(true);
+		if (result == 0) return Progress<int>(true);
 		else c.Clear();
 	}
 }
 
 // Load an existing save 
-progress<int> loadsave() {
+Progress<int> loadsave() {
 	Console c;
 	c.Clear();
 	c.GotoXY();
@@ -99,11 +99,11 @@ progress<int> loadsave() {
 		}
 	}
 
-	return progress<int>(true);
+	return Progress<int>(true);
 }
 
 // Create a new game project
-progress<int> createGame(Console& c) {
+Progress<int> createGame(Console& c) {
 	c.Clear();
 	c.GotoXY();
 
@@ -197,11 +197,11 @@ progress<int> createGame(Console& c) {
 		instance->workingProduct = Product(name, instance->day, Platform(platform), GameType(gameType));
 		instance->money -= 5000;
 	}
-	return progress<int>(true);
+	return Progress<int>(true);
 }
 
 // Set the game development speed
-progress<int> setDevPlan(Console& c) {
+Progress<int> setDevPlan(Console& c) {
 	std::string s1 = "调整开发速度", name;
 	s1 += instance->isFastDev ? "为\"普通开发\"" : "为\"加急开发\"";
 	switch (printMenu(Menu({ "更改游戏名称",s1,"返回" }, 15, true), c))
@@ -243,11 +243,11 @@ progress<int> setDevPlan(Console& c) {
 		instance->isFastDev = !instance->isFastDev;
 		break;
 	}
-	return progress<int>(true);
+	return Progress<int>(true);
 }
 
 // JobFair Sence
-progress<int> jobFair(Console& c) {
+Progress<int> jobFair(Console& c) {
 	instance->isFairChecked = true;
 	c.Clear();
 	c.GotoXY();
@@ -314,32 +314,32 @@ progress<int> jobFair(Console& c) {
 		printMenu(Menu({ "好的" }, 15, 0, instance->studio.HireStuff(jobSeekers[selection]) ? "招聘成功。" : "招聘失败，你的工作室已满！"), c);
 		break;
 	}
-	return progress<int>(true);
+	return Progress<int>(true);
 }
 
 // Save the game
-progress<bool> save(Console& c) {
+Progress<bool> save(Console& c) {
 	c.Clear();
 	c.GotoXY();
 	c.Print("你想将存档存到哪里，请输入保存存档文件的完整路径： (输入 q 取消)");
 	c.Endl();
 	std::string savePath;
 	std::getline(std::cin, savePath);
-	if (savePath == "q") return progress<bool>(false);
+	if (savePath == "q") return Progress<bool>(false);
 	auto result = instance->TrySaving(savePath, false);
 	if (result == GameData::SavingResult::FILE_EXIST)
 		if (printMenu(Menu({ "是的","不要" }, 15, 0, "文件已存在，是否覆盖？"), c) == 0)
 		{
 			result = instance->TrySaving(savePath, true);
 		}
-		else return progress<bool>(false);
+		else return Progress<bool>(false);
 	c.Clear();
 	c.GotoXY();
-	return progress<bool>(result == GameData::SavingResult::OK);
+	return Progress<bool>(result == GameData::SavingResult::OK);
 }
 
 // Main game sence(Info Panel)
-progress<int> studio(Console& c) {
+Progress<int> studio(Console& c) {
 	c.Clear();
 #pragma region Sidebars
 	for (int i = 0; i < 15; i++) {
@@ -505,9 +505,9 @@ progress<int> studio(Console& c) {
 	int subResult;
 	switch (result) {
 	case 0:
-		if (instance->noConfirm) return progress<int>(true, true, 0);
-		if (printMenu(Menu({ "是","否" }, 15, 0, "确定要进入下一回合吗？"), c) == 0) return progress<int>(true, true, 0);
-		return progress<int>(true, true, -1);
+		if (instance->noConfirm) return Progress<int>(true, true, 0);
+		if (printMenu(Menu({ "是","否" }, 15, 0, "确定要进入下一回合吗？"), c) == 0) return Progress<int>(true, true, 0);
+		return Progress<int>(true, true, -1);
 	case 1:
 		subResult = printMenu(Menu({ "制作新游戏","调整项目计划","发布游戏","返回" }, 15, true), c);
 		switch (subResult)
@@ -565,7 +565,7 @@ progress<int> studio(Console& c) {
 		}
 		break;
 	case 3:
-		subResult = printMenu(Menu({ "休假","上周财报","工作室设置","返回" }, 15, true), c);
+		subResult = printMenu(Menu({ "休假","上周财报","返回" }, 15, true), c);
 		switch (subResult)
 		{
 		case 0:
@@ -614,6 +614,6 @@ progress<int> studio(Console& c) {
 		}
 	}
 #pragma endregion
-	return progress<int>(true, true, result);
+	return Progress<int>(true, true, result);
 }
 

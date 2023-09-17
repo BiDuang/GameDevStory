@@ -7,7 +7,7 @@
 int main()
 {
 	openning();
-	mainMenu("preRev 1.3");
+	mainMenu("Rev 1.39");
 	gameCycle();
 
 	return 0;

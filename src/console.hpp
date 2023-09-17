@@ -171,7 +171,7 @@ public:
 	*
 	* @return `void`
 	*/
-	void SetColor() const {
+	void SetColor() {
 		SetConsoleTextAttribute(handle_, White);
 	}
 
@@ -183,7 +183,7 @@ public:
 	*
 	* @return `void`
 	*/
-	void SetColor(const Colors fontColor, const Colors bgColor = Black) const {
+	void SetColor(const Colors fontColor, const Colors bgColor = Black) {
 		SetConsoleTextAttribute(handle_, fontColor | bgColor << 4);
 	}
 

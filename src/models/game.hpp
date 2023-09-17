@@ -919,7 +919,7 @@ public:
 		return false;
 	}
 
-	// Develop progress getter
+	// Develop Progress getter
 	int GetDevProgress()
 	{
 		return devProgress;
